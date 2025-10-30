@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import './ProfilePage.css';
 
@@ -58,10 +58,7 @@ const ProfilePage = () => {
 
   const fetchMyReports = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/reports/my', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/reports/my');
       setReports(response.data);
     } catch (error) {
       console.error('Ошибка загрузки обращений:', error);
@@ -72,10 +69,7 @@ const ProfilePage = () => {
 
   const fetchBonusInfo = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/bonuses/my', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/bonuses/my');
       setBonusPoints(response.data.bonus_points);
     } catch (error) {
       console.error('Ошибка загрузки информации о бонусах:', error);
@@ -84,10 +78,7 @@ const ProfilePage = () => {
 
   const fetchMyRedemptions = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/bonuses/redemptions', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/bonuses/redemptions');
       setRedemptions(response.data);
     } catch (error) {
       console.error('Ошибка загрузки заявок на награждение:', error);
@@ -102,16 +93,12 @@ const ProfilePage = () => {
 
     setRedeeming(true);
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(
+      await api.post(
         '/api/bonuses/redeem',
         {
           bonus_amount: selectedBonus,
           reward_type: rewardType,
           contact_info: contactInfo
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
         }
       );
 

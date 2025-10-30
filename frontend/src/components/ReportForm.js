@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet/dist/leaflet.css';
@@ -182,12 +182,8 @@ const ReportForm = ({ onClose, onSuccess }) => {
         data.append('photo', photo);
       }
 
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-      await axios.post('/api/reports', data, {
+      await api.post('/api/reports', data, {
         headers: {
-          ...headers,
           'Content-Type': 'multipart/form-data'
         }
       });

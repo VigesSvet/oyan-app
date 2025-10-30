@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
 import './ModerationPage.css';
@@ -30,10 +30,7 @@ const ModerationPage = () => {
 
   const fetchPendingReports = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/admin/reports?status=new', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/admin/reports?status=new');
       setReports(response.data);
     } catch (error) {
       console.error('Ошибка загрузки обращений:', error);

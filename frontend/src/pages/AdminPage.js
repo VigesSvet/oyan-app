@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import './AdminPage.css';
 
 const REPORT_TYPE_NAMES = {
@@ -33,14 +33,11 @@ const AdminPage = () => {
 
   const fetchReports = async () => {
     try {
-      const token = localStorage.getItem('token');
       const url = filter === 'all' 
         ? '/api/admin/reports'
         : `/api/admin/reports?status=${filter}`;
       
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get(url);
       setReports(response.data);
     } catch (error) {
       console.error('Ошибка загрузки обращений:', error);
@@ -51,10 +48,7 @@ const AdminPage = () => {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/admin/stats', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/admin/stats');
       setStats(response.data);
     } catch (error) {
       console.error('Ошибка загрузки статистики:', error);
@@ -63,14 +57,12 @@ const AdminPage = () => {
 
   const handleStatusUpdate = async (reportId, newStatus) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.patch(
+      await api.patch(
         `/api/admin/reports/${reportId}`,
         { 
           status: newStatus,
           admin_notes: adminNotes 
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
       
       alert('Статус обращения обновлен');
@@ -89,10 +81,7 @@ const AdminPage = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`/api/admin/reports/${reportId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/admin/reports/${reportId}`);
       
       alert('Обращение удалено');
       setSelectedReport(null);

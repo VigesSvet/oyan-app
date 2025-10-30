@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { handleApiError } from '../utils/errorHandler';
 import { formatPhoneNumber, getCleanPhoneNumber } from '../utils/phoneFormatter';
-import axios from 'axios';
+import api from '../api/axios';
 import './AuthPages.css';
 
 const RegisterPage = () => {
@@ -44,7 +44,7 @@ const RegisterPage = () => {
 
     try {
       const cleanPhone = getCleanPhoneNumber(formData.phone_number);
-      const response = await axios.post('/api/auth/send-code', {
+      const response = await api.post('/api/auth/send-code', {
         phone_number: cleanPhone
       });
       

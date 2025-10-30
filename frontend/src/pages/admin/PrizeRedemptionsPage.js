@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api/axios';
 import './PrizeRedemptionsPage.css';
 
 const REDEMPTION_STATUS_NAMES = {
@@ -29,14 +29,11 @@ const PrizeRedemptionsPage = () => {
 
   const fetchRedemptions = async () => {
     try {
-      const token = localStorage.getItem('token');
       const url = filter 
         ? `/api/admin/bonus-redemptions?status=${filter}`
         : '/api/admin/bonus-redemptions';
       
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get(url);
       setRedemptions(response.data);
     } catch (error) {
       console.error('Ошибка загрузки заявок:', error);
@@ -53,15 +50,11 @@ const PrizeRedemptionsPage = () => {
 
     setUpdating(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.patch(
+      const response = await api.patch(
         `/api/admin/bonus-redemptions/${selectedRedemption.id}`,
         {
           status: newStatus,
           admin_notes: adminNotes
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
         }
       );
 

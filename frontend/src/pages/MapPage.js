@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import Map from '../components/Map';
 import LegendModal from '../components/LegendModal';
 import './MapPage.css';
@@ -22,7 +22,7 @@ const MapPage = ({ onReportClick, onLegendOpen }) => {
 
   const fetchReports = async () => {
     try {
-      const response = await axios.get('/api/reports?status=confirmed');
+      const response = await api.get('/api/reports?status=confirmed');
       setReports(response.data);
     } catch (error) {
       console.error('Ошибка загрузки обращений:', error);

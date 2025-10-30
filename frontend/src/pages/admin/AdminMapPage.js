@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api/axios';
 import AdminLayout from '../../components/AdminLayout';
 import Map from '../../components/Map';
 import './AdminMapPage.css';
@@ -20,10 +20,7 @@ const AdminMapPage = () => {
 
   const fetchReports = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/api/admin/reports', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/admin/reports');
       setReports(response.data);
     } catch (error) {
       console.error('Ошибка загрузки обращений:', error);

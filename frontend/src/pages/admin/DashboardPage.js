@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api/axios';
 import AdminLayout from '../../components/AdminLayout';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -22,16 +22,13 @@ const DashboardPage = () => {
 
   const fetchAllAnalytics = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-
       // Загружаем все данные параллельно
       const [statsRes, dateRes, typeRes, districtRes, statusRes] = await Promise.all([
-        axios.get('/api/admin/stats', { headers }),
-        axios.get(`/api/admin/analytics/by-date?period=${period}`, { headers }),
-        axios.get('/api/admin/analytics/by-type', { headers }),
-        axios.get('/api/admin/analytics/by-district', { headers }),
-        axios.get('/api/admin/analytics/by-status', { headers })
+        api.get('/api/admin/stats'),
+        api.get(`/api/admin/analytics/by-date?period=${period}`),
+        api.get('/api/admin/analytics/by-type'),
+        api.get('/api/admin/analytics/by-district'),
+        api.get('/api/admin/analytics/by-status')
       ]);
 
       setStats(statsRes.data);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/AdminLayout';
 import '../AdminPage.css';
@@ -34,14 +34,11 @@ const ReportsPage = () => {
 
   const fetchReports = async () => {
     try {
-      const token = localStorage.getItem('token');
       const url = filter === 'all' 
         ? '/api/admin/reports'
         : `/api/admin/reports?status=${filter}`;
       
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get(url);
       setReports(response.data);
       
       // Подсчитаем pending

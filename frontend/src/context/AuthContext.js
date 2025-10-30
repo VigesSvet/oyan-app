@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 
 const AuthContext = createContext();
 
@@ -23,9 +23,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const response = await axios.get('/api/auth/me', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await api.get('/api/auth/me');
         setUser(response.data);
       } catch (error) {
         localStorage.removeItem('token');
@@ -35,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (phone_number, password) => {
-    const response = await axios.post('/api/auth/login', { phone_number, password });
+    const response = await api.post('/api/auth/login', { phone_number, password });
     const { access_token } = response.data;
     localStorage.setItem('token', access_token);
     await checkAuth();
@@ -43,7 +41,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (phone_number, username, password, verification_code) => {
-    const response = await axios.post('/api/auth/register', {
+    const response = await api.post('/api/auth/register', {
       phone_number,
       username,
       password,

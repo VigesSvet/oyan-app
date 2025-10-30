@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../api/axios';
 import AdminLayout from '../../components/AdminLayout';
 import './ReportDetailPage.css';
 
@@ -35,10 +35,7 @@ const ReportDetailPage = () => {
 
   const fetchReport = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`/api/admin/reports/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get(`/api/admin/reports/${id}`);
       setReport(response.data);
       setAdminNotes(response.data.admin_notes || '');
       setKuyNumber(response.data.kuy_number || '');
@@ -54,16 +51,14 @@ const ReportDetailPage = () => {
 
   const handleStatusUpdate = async (newStatus) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.patch(
+      await api.patch(
         `/api/admin/reports/${id}`,
         {
           status: newStatus,
           admin_notes: adminNotes,
           kuy_number: kuyNumber,
           erdr_number: erdrNumber
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        }
       );
       alert('Статус обновлен');
       navigate('/admin/moderation');
@@ -76,10 +71,7 @@ const ReportDetailPage = () => {
     if (!window.confirm('Удалить это обращение?')) return;
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`/api/admin/reports/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/api/admin/reports/${id}`);
       alert('Обращение удалено');
       navigate('/admin/moderation');
     } catch (error) {
