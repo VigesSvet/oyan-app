@@ -105,9 +105,9 @@
 }
 
 .status-badge-large.status-confirmed {
-  background-color: #D1E7DD;
-  color: #0F5132;
-  border: 1px solid #198754;
+  background-color: #E8F1ED;
+  color: #4A6B60;
+  border: 1px solid #8FB59C;
 }
 
 .status-badge-large.status-rejected {

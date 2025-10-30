@@ -14,9 +14,9 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+.profile-header h1 {
 }
 
-.profile-header h1 {
   color: var(--color-text);
   font-size: 28px;
   font-weight: 600;
@@ -57,6 +57,29 @@
   margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid var(--color-border);
+}
+
+.btn-logout {
+  background-color: var(--color-danger, #dc3545);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-logout:hover {
+  background-color: var(--color-danger-hover, #bb2d3b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-logout:active {
+  transform: translateY(0);
 }
 
 .user-info-card {

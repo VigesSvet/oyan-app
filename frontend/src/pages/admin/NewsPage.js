@@ -240,7 +240,7 @@ const NewsPage = () => {
       ) : news.length === 0 ? (
         <div className="news-table-container">
           <div className="empty-state">
-            <div className="empty-state-icon">📰</div>
+            <div className="empty-state-icon">—</div>
             <p>Нет новостей. Создайте первую новость!</p>
           </div>
         </div>
@@ -266,7 +266,7 @@ const NewsPage = () => {
                   </td>
                   <td>
                     <span className={`news-status ${item.is_published ? 'status-published' : 'status-draft'}`}>
-                      {item.is_published ? '✓ Опубликовано' : '📝 Черновик'}
+                      {item.is_published ? 'Опубликовано' : 'Черновик'}
                     </span>
                   </td>
                   <td>{new Date(item.created_at).toLocaleDateString('ru-RU')}</td>
@@ -345,7 +345,7 @@ const NewsPage = () => {
                     display: 'block',
                     margin: 0,
                   }}>
-                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>📸</div>
+                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>⬆</div>
                     <p style={{ margin: '0 0 8px 0', fontWeight: '500' }}>
                       Нажмите для загрузки изображения
                     </p>

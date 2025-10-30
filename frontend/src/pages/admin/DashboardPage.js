@@ -88,19 +88,19 @@ const DashboardPage = () => {
         {stats && (
           <div className="kpi-grid">
             <div className="kpi-card kpi-total">
-              <div className="kpi-label">📊 Всего обращений</div>
+              <div className="kpi-label">Всего обращений</div>
               <div className="kpi-value">{stats.total_reports}</div>
             </div>
             <div className="kpi-card kpi-new">
-              <div className="kpi-label">✨ Новых</div>
+              <div className="kpi-label">Новых</div>
               <div className="kpi-value">{stats.new_reports}</div>
             </div>
             <div className="kpi-card kpi-confirmed">
-              <div className="kpi-label">✓ Верифицировано</div>
+              <div className="kpi-label">Верифицировано</div>
               <div className="kpi-value">{stats.confirmed_reports}</div>
             </div>
             <div className="kpi-card kpi-rejected">
-              <div className="kpi-label">✗ Отклонено</div>
+              <div className="kpi-label">Отклонено</div>
               <div className="kpi-value">{stats.rejected_reports}</div>
             </div>
           </div>
@@ -161,7 +161,7 @@ const DashboardPage = () => {
           
           {/* График динамики обращений */}
           <div className="chart-card full-width">
-            <h3>📈 Динамика обращений</h3>
+            <h3>Динамика обращений</h3>
             {dateAnalytics.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={dateAnalytics} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
@@ -178,8 +178,8 @@ const DashboardPage = () => {
                   <Line 
                     type="monotone" 
                     dataKey="count" 
-                    stroke="#0D6EFD" 
-                    dot={{ fill: '#0D6EFD', r: 4 }}
+                    stroke="#6B95B3" 
+                    dot={{ fill: '#6B95B3', r: 4 }}
                     activeDot={{ r: 6 }}
                     strokeWidth={2}
                     name="Обращения"
@@ -193,7 +193,7 @@ const DashboardPage = () => {
 
           {/* Круговая диаграмма по категориям */}
           <div className="chart-card">
-            <h3>📊 Распределение по категориям</h3>
+            <h3>Распределение по категориям</h3>
             {typeAnalytics.length > 0 && typeAnalytics.some(t => t.value > 0) ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -230,7 +230,7 @@ const DashboardPage = () => {
 
           {/* Столбчатый график по районам */}
           <div className="chart-card">
-            <h3>🗺️ Обращения по районам</h3>
+            <h3>Обращения по районам</h3>
             {districtAnalytics.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart 
@@ -242,7 +242,7 @@ const DashboardPage = () => {
                   <XAxis type="number" />
                   <YAxis dataKey="district" type="category" width={150} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#0D6EFD" radius={[0, 8, 8, 0]} />
+                  <Bar dataKey="count" fill="#6B95B3" radius={[0, 8, 8, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -252,7 +252,7 @@ const DashboardPage = () => {
 
           {/* Диаграмма по статусам */}
           <div className="chart-card">
-            <h3>✓ Распределение по статусам</h3>
+            <h3>Распределение по статусам</h3>
             {statusAnalytics.length > 0 && statusAnalytics.some(s => s.value > 0) ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>

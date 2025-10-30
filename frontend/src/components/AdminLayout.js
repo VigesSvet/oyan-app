@@ -5,25 +5,19 @@ import './AdminLayout.css';
 
 const AdminLayout = ({ children, pendingCount = 0 }) => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { user, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  const { user } = useAuth();
 
   const isActive = (path) => {
     return location.pathname === path ? 'active' : '';
   };
 
   const menuItems = [
-    { path: '/admin/dashboard', icon: '📊', label: 'Аналитика' },
-    { path: '/admin/moderation', icon: '🛡️', label: 'Модерирование', badge: pendingCount },
-    { path: '/admin/reports', icon: '📋', label: 'Статусы' },
-    { path: '/admin/map', icon: '🗺️', label: 'Карта' },
-    { path: '/admin/news', icon: '📰', label: 'Новости' },
-    { path: '/admin/prize-redemptions', icon: '🎁', label: 'Заявки на награды' },
+    { path: '/admin/dashboard', icon: '◆', label: 'Аналитика' },
+    { path: '/admin/moderation', icon: '✓', label: 'Модерирование', badge: pendingCount },
+    { path: '/admin/reports', icon: '→', label: 'Статусы' },
+    { path: '/admin/map', icon: '◉', label: 'Карта' },
+    { path: '/admin/news', icon: '☰', label: 'Новости' },
+    { path: '/admin/prize-redemptions', icon: '★', label: 'Заявки на награды' },
   ];
 
   return (
@@ -44,7 +38,6 @@ const AdminLayout = ({ children, pendingCount = 0 }) => {
               to={item.path}
               className={`sidebar-link ${isActive(item.path)}`}
             >
-              <span className="sidebar-icon">{item.icon}</span>
               <span className="sidebar-label">{item.label}</span>
               {item.badge > 0 && (
                 <span className="sidebar-badge">{item.badge}</span>
@@ -54,7 +47,7 @@ const AdminLayout = ({ children, pendingCount = 0 }) => {
         </nav>
 
         {/* Профиль внизу */}
-        <div className="sidebar-profile">
+        <Link to="/profile" className="sidebar-profile">
           <div className="profile-info">
             <div className="profile-avatar">
               {user?.username.charAt(0).toUpperCase()}
@@ -64,10 +57,7 @@ const AdminLayout = ({ children, pendingCount = 0 }) => {
               <div className="profile-role">Администратор</div>
             </div>
           </div>
-          <button className="btn-logout" onClick={handleLogout} title="Выйти">
-            ↩️
-          </button>
-        </div>
+        </Link>
       </aside>
 
       {/* Светлая область контента */}

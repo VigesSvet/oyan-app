@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './ProfilePage.css';
 
@@ -155,7 +156,7 @@ const ProfilePage = () => {
           <div className="user-info-card">
             <p><strong>Имя:</strong> {user.username}</p>
             <p><strong>Телефон:</strong> {user.phone_number}</p>
-            <p><strong>Статус:</strong> {user.is_phone_verified ? '✅ Подтвержден' : '⏳ Не подтвержден'}</p>
+            <p><strong>Статус:</strong> {user.is_phone_verified ? 'Подтвержден' : 'Не подтвержден'}</p>
             <p><strong>Роль:</strong> {user.is_admin ? 'Администратор' : 'Пользователь'}</p>
           </div>
         </div>
@@ -256,7 +257,7 @@ const ProfilePage = () => {
                   </div>
                   
                   <h3>{REPORT_TYPE_NAMES[report.report_type]}</h3>
-                  <p className="report-address">📍 {report.address}</p>
+                  <p className="report-address">{report.address}</p>
                   <p className="report-description">{report.description}</p>
                   
                   {report.photo_url && (

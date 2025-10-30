@@ -15,8 +15,8 @@ const REPORT_TYPE_NAMES = {
 
 const STATUS_NAMES = {
   new: 'Ожидает',
-  confirmed: 'Подтвержден',
   rejected: 'Отклонен'
+  confirmed: 'Подтвержден',
 };
 
 const ReportDetailPage = () => {
@@ -123,7 +123,7 @@ const ReportDetailPage = () => {
             {/* Приложенные фото */}
             {report.photo_url && (
               <div className="detail-card">
-                <h3>📸 Приложенные фото</h3>
+                <h3>Приложенные фото</h3>
                 <div className="photo-gallery">
                   <img 
                     src={`http://localhost:8000${report.photo_url}`} 
@@ -222,7 +222,7 @@ const ReportDetailPage = () => {
                 onClick={handleDelete}
                 style={{ width: '100%', marginTop: '12px' }}
               >
-                🗑 Удалить обращение
+                Удалить обращение
               </button>
             </div>
           </div>

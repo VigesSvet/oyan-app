@@ -394,12 +394,12 @@ def get_analytics_by_type(
 ):
     """Получение распределения обращений по типам (категориям)"""
     type_mapping = {
-        "drug_dealer": {"name": "Наркозакладчики", "color": "#0D6EFD"},
-        "drug_graffiti": {"name": "Наркограффити", "color": "#FFC107"},
-        "drug_den": {"name": "Наркопритон", "color": "#DC3545"},
-        "drug_addict": {"name": "Проживание наркозависимых", "color": "#17A2B8"},
-        "overdose": {"name": "Передозировка", "color": "#E83E8C"},
-        "other": {"name": "Иные сведения", "color": "#6C757D"}
+        "drug_dealer": {"name": "Наркозакладчики", "color": "#D4DFE8"},
+        "drug_graffiti": {"name": "Наркограффити", "color": "#A8BFCE"},
+        "drug_den": {"name": "Наркопритон", "color": "#6B95B3"},
+        "drug_addict": {"name": "Проживание наркозависимых", "color": "#4A6B8A"},
+        "overdose": {"name": "Передозировка", "color": "#2D4558"},
+        "other": {"name": "Иные сведения", "color": "#1F3039"}
     }
     
     result = []
@@ -449,9 +449,9 @@ def get_analytics_by_status(
 ):
     """Получение распределения обращений по статусам"""
     status_mapping = {
-        "new": {"name": "Новые", "color": "#FFC107"},
-        "confirmed": {"name": "Верифицировано", "color": "#198754"},
-        "rejected": {"name": "Отклонено", "color": "#DC3545"}
+        "new": {"name": "Новые", "color": "#A8BFCE"},
+        "confirmed": {"name": "Верифицировано", "color": "#6B95B3"},
+        "rejected": {"name": "Отклонено", "color": "#4A6B8A"}
     }
     
     result = []
@@ -582,7 +582,7 @@ def redeem_bonus(
         user_id=current_user.id,
         bonus_amount=redemption.bonus_amount,
         reward_type=redemption.reward_type,
-        user_email=current_user.email,
+        user_email=current_user.phone_number,
         user_username=current_user.username,
         contact_info=redemption.contact_info,
         status=BonusRedemptionStatus.PENDING
