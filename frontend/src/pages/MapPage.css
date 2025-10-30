@@ -21,7 +21,7 @@
   cursor: pointer;
   box-shadow: var(--shadow-lg);
   transition: all 0.2s ease;
-  z-index: 1000;
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +55,8 @@
   
   /* Кнопка "Сообщить" - круглая, справа снизу на мобильных, над нижней панелью */
   .floating-report-btn {
-    bottom: 100px; /* Над нижней панелью навигации */
+    position: fixed;
+    bottom: 90px; /* Над нижней панелью навигации */
     right: 16px;
     width: 56px;
     height: 56px;
