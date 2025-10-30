@@ -1,0 +1,29 @@
+.map-page {
+  position: relative;
+  height: calc(100vh - 80px);
+}
+
+.add-report-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+  padding: 15px 30px;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.add-report-btn:hover {
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .add-report-btn {
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}

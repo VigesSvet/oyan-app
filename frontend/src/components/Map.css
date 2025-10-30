@@ -1,0 +1,125 @@
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 80px);
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+.map-controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.control-button {
+  background: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  color: #333;
+}
+
+.control-button:hover {
+  background: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.control-button.active {
+  background: #FF6B6B;
+  color: white;
+}
+
+.control-button.active:hover {
+  background: #FF5252;
+}
+
+.map-legend {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-width: 250px;
+}
+
+.map-legend h4 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 10px;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.legend-label {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Стили для popup маркера */
+.marker-popup {
+  max-width: 300px;
+}
+
+.marker-popup h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.marker-popup p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.marker-popup strong {
+  color: #333;
+}
+
+.marker-popup img {
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .map-legend {
+    top: 10px;
+    right: 10px;
+    max-width: 200px;
+    padding: 10px;
+  }
+  
+  .map-legend h4 {
+    font-size: 14px;
+  }
+  
+  .legend-label {
+    font-size: 12px;
+  }
+}
