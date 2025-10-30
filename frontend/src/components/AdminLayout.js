@@ -23,7 +23,7 @@ const AdminLayout = ({ children, pendingCount = 0 }) => {
     { path: '/admin/reports', icon: '📋', label: 'Статусы' },
     { path: '/admin/map', icon: '🗺️', label: 'Карта' },
     { path: '/admin/news', icon: '📰', label: 'Новости' },
-    { path: '/admin/prizes', icon: '🎁', label: 'Призы' },
+    { path: '/admin/prize-redemptions', icon: '🎁', label: 'Заявки на награды' },
   ];
 
   return (

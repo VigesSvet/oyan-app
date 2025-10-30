@@ -7,10 +7,12 @@ import os
 from datetime import datetime
 
 from database import engine, get_db, Base
-from models import User, Report, ReportStatus, ReportType
+from models import User, Report, ReportStatus, ReportType, News, BonusRedemption, BonusRedemptionStatus
 from schemas import (
     UserCreate, UserLogin, UserResponse,
     ReportCreate, ReportResponse, ReportUpdate,
+    NewsCreate, NewsUpdate, NewsResponse,
+    BonusRedemptionCreate, BonusRedemptionResponse,
     Token
 )
 from auth import (
@@ -163,6 +165,29 @@ def get_report(report_id: int, db: Session = Depends(get_db)):
     return report
 
 
+# ==================== NEWS ENDPOINTS ====================
+
+@app.get("/api/news", response_model=List[NewsResponse])
+def get_public_news(db: Session = Depends(get_db)):
+    """Получение всех опубликованных новостей для публичного просмотра"""
+    news = db.query(News).filter(
+        News.is_published == True
+    ).order_by(News.published_at.desc()).all()
+    return news
+
+
+@app.get("/api/news/{news_id}", response_model=NewsResponse)
+def get_news_detail(news_id: int, db: Session = Depends(get_db)):
+    """Получение конкретной опубликованной новости"""
+    news = db.query(News).filter(
+        News.id == news_id,
+        News.is_published == True
+    ).first()
+    if not news:
+        raise HTTPException(status_code=404, detail="Новость не найдена")
+    return news
+
+
 # ==================== ADMIN ENDPOINTS ====================
 
 @app.get("/api/admin/reports", response_model=List[ReportResponse])
@@ -190,8 +215,18 @@ def update_report_status(
     if not report:
         raise HTTPException(status_code=404, detail="Обращение не найдено")
     
+    old_status = report.status
+    
     if report_update.status:
         report.status = ReportStatus(report_update.status)
+        
+        # Начисляем бонусы если обращение подтверждено и это первое подтверждение
+        if report.status == ReportStatus.CONFIRMED and old_status != ReportStatus.CONFIRMED:
+            if report.user_id:
+                user = db.query(User).filter(User.id == report.user_id).first()
+                if user:
+                    user.bonus_points += 10
+                    db.add(user)
     
     if report_update.admin_notes:
         report.admin_notes = report_update.admin_notes
@@ -237,6 +272,353 @@ def get_stats(
         "confirmed_reports": confirmed_reports,
         "rejected_reports": rejected_reports
     }
+
+
+@app.get("/api/admin/analytics/by-date")
+def get_analytics_by_date(
+    period: str = "month",  # day, week, month
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Получение динамики обращений по датам"""
+    from datetime import timedelta
+    
+    now = datetime.utcnow()
+    
+    if period == "day":
+        start_date = now - timedelta(days=1)
+        date_format = "%H:%M"
+    elif period == "week":
+        start_date = now - timedelta(days=7)
+        date_format = "%a"
+    else:  # month
+        start_date = now - timedelta(days=30)
+        date_format = "%d.%m"
+    
+    reports = db.query(Report).filter(Report.created_at >= start_date).all()
+    
+    # Группируем по датам
+    date_groups = {}
+    for report in reports:
+        date_key = report.created_at.strftime(date_format)
+        if date_key not in date_groups:
+            date_groups[date_key] = {"date": date_key, "count": 0}
+        date_groups[date_key]["count"] += 1
+    
+    # Сортируем по дате
+    result = sorted(date_groups.values(), key=lambda x: x["date"])
+    return result
+
+
+@app.get("/api/admin/analytics/by-type")
+def get_analytics_by_type(
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Получение распределения обращений по типам (категориям)"""
+    type_mapping = {
+        "drug_dealer": {"name": "Наркозакладчики", "color": "#0D6EFD"},
+        "drug_graffiti": {"name": "Наркограффити", "color": "#FFC107"},
+        "drug_den": {"name": "Наркопритон", "color": "#DC3545"},
+        "drug_addict": {"name": "Проживание наркозависимых", "color": "#17A2B8"},
+        "overdose": {"name": "Передозировка", "color": "#E83E8C"},
+        "other": {"name": "Иные сведения", "color": "#6C757D"}
+    }
+    
+    result = []
+    for report_type in ReportType:
+        count = db.query(Report).filter(Report.report_type == report_type).count()
+        type_key = report_type.value
+        type_info = type_mapping.get(type_key, {"name": type_key, "color": "#999"})
+        
+        result.append({
+            "name": type_info["name"],
+            "value": count,
+            "color": type_info["color"],
+            "type": type_key
+        })
+    
+    return result
+
+
+@app.get("/api/admin/analytics/by-district")
+def get_analytics_by_district(
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Получение распределения обращений по районам"""
+    reports = db.query(Report).all()
+    
+    # Группируем по районам (извлекаем из адреса первые слова)
+    district_groups = {}
+    for report in reports:
+        # Простой способ - берем первое слово из адреса как район
+        # Можно улучшить в будущем с более сложной логикой парсинга
+        parts = report.address.split(",")
+        district = parts[-1].strip() if parts else "Неизвестный район"
+        
+        if district not in district_groups:
+            district_groups[district] = {"district": district, "count": 0}
+        district_groups[district]["count"] += 1
+    
+    result = sorted(district_groups.values(), key=lambda x: x["count"], reverse=True)[:10]
+    return result
+
+
+@app.get("/api/admin/analytics/by-status")
+def get_analytics_by_status(
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Получение распределения обращений по статусам"""
+    status_mapping = {
+        "new": {"name": "Новые", "color": "#FFC107"},
+        "confirmed": {"name": "Верифицировано", "color": "#198754"},
+        "rejected": {"name": "Отклонено", "color": "#DC3545"}
+    }
+    
+    result = []
+    for status in ReportStatus:
+        count = db.query(Report).filter(Report.status == status).count()
+        status_key = status.value
+        status_info = status_mapping.get(status_key, {"name": status_key, "color": "#999"})
+        
+        result.append({
+            "name": status_info["name"],
+            "value": count,
+            "color": status_info["color"],
+            "status": status_key
+        })
+    
+    return result
+
+
+# ==================== ADMIN NEWS ENDPOINTS ====================
+
+@app.get("/api/admin/news", response_model=List[NewsResponse])
+def get_all_news_admin(
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Получение всех новостей для админа (опубликованные и черновики)"""
+    news = db.query(News).order_by(News.created_at.desc()).all()
+    return news
+
+
+@app.post("/api/admin/news", response_model=NewsResponse)
+def create_news(
+    news_data: NewsCreate,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Создание новой новости (только для админов)"""
+    new_news = News(
+        title=news_data.title,
+        content=news_data.content,
+        is_published=news_data.is_published,
+        author_id=current_user.id,
+        image_url=news_data.image_url,
+        published_at=datetime.utcnow() if news_data.is_published else None
+    )
+    
+    db.add(new_news)
+    db.commit()
+    db.refresh(new_news)
+    return new_news
+
+
+@app.put("/api/admin/news/{news_id}", response_model=NewsResponse)
+def update_news(
+    news_id: int,
+    news_update: NewsUpdate,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Обновление новости (только для админов)"""
+    news = db.query(News).filter(News.id == news_id).first()
+    if not news:
+        raise HTTPException(status_code=404, detail="Новость не найдена")
+    
+    if news_update.title:
+        news.title = news_update.title
+    
+    if news_update.content:
+        news.content = news_update.content
+    
+    if news_update.image_url is not None:
+        news.image_url = news_update.image_url
+    
+    if news_update.is_published is not None:
+        news.is_published = news_update.is_published
+        if news_update.is_published and not news.published_at:
+            news.published_at = datetime.utcnow()
+    
+    news.updated_at = datetime.utcnow()
+    
+    db.commit()
+    db.refresh(news)
+    return news
+
+
+@app.delete("/api/admin/news/{news_id}")
+def delete_news(
+    news_id: int,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Удаление новости (только для админов)"""
+    news = db.query(News).filter(News.id == news_id).first()
+    if not news:
+        raise HTTPException(status_code=404, detail="Новость не найдена")
+    
+    db.delete(news)
+    db.commit()
+    return {"message": "Новость удалена"}
+
+
+# ==================== BONUS ENDPOINTS ====================
+
+@app.post("/api/bonuses/redeem", response_model=BonusRedemptionResponse)
+def redeem_bonus(
+    redemption: BonusRedemptionCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Создание заявки на награждение бонусами"""
+    
+    # Проверяем, есть ли достаточно бонусов
+    if current_user.bonus_points < redemption.bonus_amount:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Недостаточно бонусов. У вас {current_user.bonus_points} бонусов"
+        )
+    
+    # Проверяем, что bonus_amount один из допустимых значений
+    if redemption.bonus_amount not in [50, 100, 150]:
+        raise HTTPException(
+            status_code=400,
+            detail="Можно потратить только 50, 100 или 150 бонусов"
+        )
+    
+    # Создаем заявку на награждение
+    bonus_redemption = BonusRedemption(
+        user_id=current_user.id,
+        bonus_amount=redemption.bonus_amount,
+        reward_type=redemption.reward_type,
+        user_email=current_user.email,
+        user_username=current_user.username,
+        contact_info=redemption.contact_info,
+        status=BonusRedemptionStatus.PENDING
+    )
+    
+    # Вычитаем бонусы сразу
+    current_user.bonus_points -= redemption.bonus_amount
+    
+    db.add(bonus_redemption)
+    db.add(current_user)
+    db.commit()
+    db.refresh(bonus_redemption)
+    
+    return bonus_redemption
+
+
+@app.get("/api/bonuses/redemptions", response_model=List[BonusRedemptionResponse])
+def get_my_redemptions(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Получение своих заявок на награждение"""
+    redemptions = db.query(BonusRedemption).filter(
+        BonusRedemption.user_id == current_user.id
+    ).order_by(BonusRedemption.created_at.desc()).all()
+    return redemptions
+
+
+@app.get("/api/bonuses/my", response_model=dict)
+def get_my_bonus_info(
+    current_user: User = Depends(get_current_user)
+):
+    """Получение информации о бонусах текущего пользователя"""
+    return {
+        "bonus_points": current_user.bonus_points,
+        "user_id": current_user.id,
+        "username": current_user.username
+    }
+
+
+# ==================== ADMIN BONUS ENDPOINTS ====================
+
+@app.get("/api/admin/bonus-redemptions", response_model=List[BonusRedemptionResponse])
+def get_all_redemptions(
+    status: Optional[str] = None,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Получение всех заявок на награждение (для админа)"""
+    query = db.query(BonusRedemption)
+    
+    if status:
+        query = query.filter(BonusRedemption.status == BonusRedemptionStatus(status))
+    
+    redemptions = query.order_by(BonusRedemption.created_at.desc()).all()
+    return redemptions
+
+
+@app.patch("/api/admin/bonus-redemptions/{redemption_id}", response_model=BonusRedemptionResponse)
+def update_redemption_status(
+    redemption_id: int,
+    status: str = None,
+    admin_notes: Optional[str] = None,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Обновление статуса заявки на награждение"""
+    redemption = db.query(BonusRedemption).filter(BonusRedemption.id == redemption_id).first()
+    
+    if not redemption:
+        raise HTTPException(status_code=404, detail="Заявка не найдена")
+    
+    if status:
+        redemption.status = BonusRedemptionStatus(status)
+    
+    if admin_notes:
+        redemption.admin_notes = admin_notes
+    
+    redemption.reviewed_at = datetime.utcnow()
+    redemption.reviewed_by = current_user.id
+    
+    db.commit()
+    db.refresh(redemption)
+    return redemption
+
+
+# ==================== FILE UPLOAD ENDPOINT ====================
+
+@app.post("/api/upload")
+def upload_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_admin)
+):
+    """Загрузка файла (изображения) - только для админов"""
+    try:
+        # Генерируем уникальное имя файла
+        import uuid
+        file_ext = os.path.splitext(file.filename)[1]
+        unique_filename = f"{uuid.uuid4()}{file_ext}"
+        file_path = os.path.join(UPLOAD_DIR, unique_filename)
+        
+        # Сохраняем файл
+        with open(file_path, "wb") as buffer:
+            buffer.write(file.file.read())
+        
+        # Возвращаем путь до файла
+        return {
+            "file_path": f"/uploads/{unique_filename}",
+            "url": f"/uploads/{unique_filename}",
+            "filename": unique_filename
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Ошибка при загрузке файла: {str(e)}")
 
 
 if __name__ == "__main__":

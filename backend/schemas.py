@@ -24,6 +24,7 @@ class UserResponse(BaseModel):
     email: str
     username: str
     is_admin: bool
+    bonus_points: int
     created_at: datetime
 
     class Config:
@@ -75,6 +76,68 @@ class ReportResponse(BaseModel):
     reviewed_by: Optional[int] = None
     created_at: datetime
     updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# ==================== NEWS SCHEMAS ====================
+
+class NewsCreate(BaseModel):
+    """Схема создания новости"""
+    title: str
+    content: str
+    is_published: bool = False
+    image_url: Optional[str] = None
+
+
+class NewsUpdate(BaseModel):
+    """Схема обновления новости"""
+    title: Optional[str] = None
+    content: Optional[str] = None
+    is_published: Optional[bool] = None
+    image_url: Optional[str] = None
+
+
+class NewsResponse(BaseModel):
+    """Схема ответа новости"""
+    id: int
+    title: str
+    content: str
+    image_url: Optional[str] = None
+    is_published: bool
+    author_id: int
+    created_at: datetime
+    updated_at: datetime
+    published_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ==================== BONUS SCHEMAS ====================
+
+class BonusRedemptionCreate(BaseModel):
+    """Схема создания заявки на награждение"""
+    bonus_amount: int  # 50, 100 или 150
+    reward_type: str  # Описание награды
+    contact_info: Optional[str] = None  # Контактная информация
+
+
+class BonusRedemptionResponse(BaseModel):
+    """Схема ответа заявки на награждение"""
+    id: int
+    user_id: int
+    bonus_amount: int
+    reward_type: str
+    status: str
+    user_email: str
+    user_username: str
+    contact_info: Optional[str] = None
+    admin_notes: Optional[str] = None
+    created_at: datetime
+    reviewed_at: Optional[datetime] = None
+    reviewed_by: Optional[int] = None
 
     class Config:
         from_attributes = True
