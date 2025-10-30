@@ -15,20 +15,21 @@ def create_admin():
     
     try:
         # Проверка существующего админа
-        admin = db.query(User).filter(User.email == "admin@oyun.kz").first()
+        admin = db.query(User).filter(User.phone_number == "+77777777777").first()
         
         if admin:
             print("⚠️  Администратор уже существует!")
-            print(f"Email: {admin.email}")
+            print(f"Телефон: {admin.phone_number}")
             print(f"Username: {admin.username}")
             return
         
         # Создание нового администратора
         admin = User(
-            email="admin@oyun.kz",
+            phone_number="+77777777777",
             username="admin",
             hashed_password=get_password_hash("admin123"),  # Измените пароль!
-            is_admin=True
+            is_admin=True,
+            is_phone_verified=True  # Админ автоматически верифицирован
         )
         
         db.add(admin)
@@ -36,7 +37,7 @@ def create_admin():
         db.refresh(admin)
         
         print("✅ Администратор успешно создан!")
-        print(f"Email: admin@oyun.kz")
+        print(f"Телефон: +77777777777")
         print(f"Password: admin123")
         print("⚠️  ВАЖНО: Измените пароль после первого входа!")
         

@@ -22,6 +22,19 @@
   box-shadow: var(--shadow-lg);
   transition: all 0.2s ease;
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.floating-report-btn .material-symbols-outlined {
+  font-size: 20px;
+  display: none; /* Скрываем иконку на десктопе */
+}
+
+.floating-report-btn .btn-text {
+  display: inline; /* Показываем текст на десктопе */
 }
 
 .floating-report-btn:hover {
@@ -32,4 +45,38 @@
 
 .floating-report-btn:active {
   transform: translateY(0);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .map-page {
+    height: calc(100vh - 56px); /* Высота с учетом меньшего header */
+  }
+  
+  /* Кнопка "Сообщить" - круглая, справа снизу на мобильных, над нижней панелью */
+  .floating-report-btn {
+    bottom: 100px; /* Над нижней панелью навигации */
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border-radius: 50%; /* Делаем круглой */
+  }
+  
+  .floating-report-btn .material-symbols-outlined {
+    display: flex; /* Показываем иконку на мобильных */
+    font-size: 24px;
+  }
+  
+  .floating-report-btn .btn-text {
+    display: none; /* Скрываем текст на мобильных */
+  }
+  
+  .floating-report-btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  .floating-report-btn:active {
+    transform: translateY(0);
+  }
 }

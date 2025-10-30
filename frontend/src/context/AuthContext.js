@@ -34,19 +34,20 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
-  const login = async (email, password) => {
-    const response = await axios.post('/api/auth/login', { email, password });
+  const login = async (phone_number, password) => {
+    const response = await axios.post('/api/auth/login', { phone_number, password });
     const { access_token } = response.data;
     localStorage.setItem('token', access_token);
     await checkAuth();
     return response.data;
   };
 
-  const register = async (email, username, password) => {
+  const register = async (phone_number, username, password, verification_code) => {
     const response = await axios.post('/api/auth/register', {
-      email,
+      phone_number,
       username,
-      password
+      password,
+      verification_code
     });
     return response.data;
   };

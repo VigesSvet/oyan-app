@@ -50,13 +50,13 @@ def get_current_user(
     
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
+        phone_number: str = payload.get("sub")
+        if phone_number is None:
             return None
     except JWTError:
         return None
     
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(User).filter(User.phone_number == phone_number).first()
     return user
 
 
@@ -74,8 +74,8 @@ def get_current_user_required(
     
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
+        phone_number: str = payload.get("sub")
+        if phone_number is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Неверный токен",
@@ -88,7 +88,7 @@ def get_current_user_required(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(User).filter(User.phone_number == phone_number).first()
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

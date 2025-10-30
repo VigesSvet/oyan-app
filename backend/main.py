@@ -4,14 +4,16 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from typing import Optional, List
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+import random
+import string
 
 from database import engine, get_db, Base
 from models import User, Report, ReportStatus, ReportType
 from schemas import (
     UserCreate, UserLogin, UserResponse,
     ReportCreate, ReportResponse, ReportUpdate,
-    Token
+    Token, PhoneVerificationRequest, VerificationResponse
 )
 from auth import (
     get_password_hash, verify_password,
@@ -40,34 +42,96 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # ==================== AUTH ENDPOINTS ====================
 
+def generate_verification_code() -> str:
+    """Генерация 6-значного кода верификации"""
+    return ''.join(random.choices(string.digits, k=6))
+
+
+@app.post("/api/auth/send-code", response_model=VerificationResponse)
+def send_verification_code(request: PhoneVerificationRequest, db: Session = Depends(get_db)):
+    """Отправка кода верификации на телефон (ДЕМО версия)"""
+    # В реальном приложении здесь будет интеграция с SMS-сервисом
+    
+    code = generate_verification_code()
+    expires = datetime.utcnow() + timedelta(minutes=10)
+    
+    # Проверяем, существует ли пользователь с таким номером
+    user = db.query(User).filter(User.phone_number == request.phone_number).first()
+    
+    if user:
+        # Если пользователь уже верифицирован, не даем повторно зарегистрироваться
+        if user.is_phone_verified:
+            raise HTTPException(status_code=400, detail="Номер телефона уже зарегистрирован")
+        
+        # Обновляем код для существующего пользователя
+        user.verification_code = code
+        user.verification_code_expires = expires
+    else:
+        # Создаем временную запись пользователя
+        user = User(
+            phone_number=request.phone_number,
+            username="temp",  # Будет обновлено при регистрации
+            hashed_password="temp",  # Будет обновлено при регистрации
+            is_phone_verified=False,
+            verification_code=code,
+            verification_code_expires=expires
+        )
+        db.add(user)
+    
+    db.commit()
+    
+    # ДЕМО: возвращаем код в ответе (в реальном приложении только отправляем SMS!)
+    print(f"📱 ДЕМО SMS: Код верификации для {request.phone_number}: {code}")
+    
+    return {
+        "message": f"Код отправлен на номер {request.phone_number}",
+        "code": code  # ⚠️ Только для демо! В продакшене убрать!
+    }
+
+
 @app.post("/api/auth/register", response_model=UserResponse)
 def register(user: UserCreate, db: Session = Depends(get_db)):
-    """Регистрация нового пользователя"""
-    db_user = db.query(User).filter(User.email == user.email).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
+    """Регистрация нового пользователя с верификацией телефона"""
+    # Проверяем, существует ли пользователь
+    db_user = db.query(User).filter(User.phone_number == user.phone_number).first()
     
-    hashed_password = get_password_hash(user.password)
-    new_user = User(
-        email=user.email,
-        username=user.username,
-        hashed_password=hashed_password,
-        is_admin=False
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
+    if db_user and db_user.is_phone_verified:
+        raise HTTPException(status_code=400, detail="Номер телефона уже зарегистрирован")
+    
+    # Проверяем код верификации
+    if db_user:
+        if not db_user.verification_code or db_user.verification_code != user.verification_code:
+            raise HTTPException(status_code=400, detail="Неверный код верификации")
+        
+        if db_user.verification_code_expires < datetime.utcnow():
+            raise HTTPException(status_code=400, detail="Код верификации истек")
+        
+        # Обновляем существующего пользователя
+        db_user.username = user.username
+        db_user.hashed_password = get_password_hash(user.password)
+        db_user.is_phone_verified = True
+        db_user.verification_code = None
+        db_user.verification_code_expires = None
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    
+    # Если пользователя нет, создаем нового
+    # (но сначала должен быть вызван send-code)
+    raise HTTPException(status_code=400, detail="Сначала запросите код верификации")
 
 
 @app.post("/api/auth/login", response_model=Token)
 def login(user: UserLogin, db: Session = Depends(get_db)):
     """Вход пользователя"""
-    db_user = db.query(User).filter(User.email == user.email).first()
+    db_user = db.query(User).filter(User.phone_number == user.phone_number).first()
     if not db_user or not verify_password(user.password, db_user.hashed_password):
-        raise HTTPException(status_code=401, detail="Неверный email или пароль")
+        raise HTTPException(status_code=401, detail="Неверный номер телефона или пароль")
     
-    access_token = create_access_token(data={"sub": db_user.email})
+    if not db_user.is_phone_verified:
+        raise HTTPException(status_code=401, detail="Телефон не верифицирован")
+    
+    access_token = create_access_token(data={"sub": db_user.phone_number})
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -176,6 +240,19 @@ def get_all_reports_admin(
     if status:
         query = query.filter(Report.status == ReportStatus(status))
     return query.all()
+
+
+@app.get("/api/admin/reports/{report_id}", response_model=ReportResponse)
+def get_report_admin(
+    report_id: int,
+    current_user: User = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Получение конкретного обращения для админа"""
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Обращение не найдено")
+    return report
 
 
 @app.patch("/api/admin/reports/{report_id}", response_model=ReportResponse)

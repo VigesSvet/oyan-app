@@ -53,6 +53,58 @@
   text-decoration: underline;
 }
 
+/* Стили для SMS верификации */
+.demo-code-info {
+  background: #e7f3ff;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  text-align: center;
+  border: 1px solid #b3d9ff;
+}
+
+.demo-code-info strong {
+  color: #004085;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.demo-code-info p {
+  font-size: 12px;
+  color: #004085;
+  margin: 0;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 12px 24px;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--color-background-light);
+  border-color: var(--color-text-secondary);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
 @media (max-width: 768px) {
   .auth-card {
     padding: 32px 24px;
@@ -60,5 +112,9 @@
 
   .auth-card h2 {
     font-size: 22px;
+  }
+  
+  .demo-code-info strong {
+    font-size: 14px;
   }
 }

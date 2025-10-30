@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { handleApiError } from '../utils/errorHandler';
 import './AuthPages.css';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,10 +19,11 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(phoneNumber, password);
       navigate('/profile');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Ошибка входа');
+      console.error('Login error:', err.response?.data);
+      setError(handleApiError(err, 'Ошибка входа'));
     } finally {
       setLoading(false);
     }
@@ -37,14 +39,15 @@ const LoginPage = () => {
             {error && <div className="error">{error}</div>}
 
             <div className="form-group">
-              <label>Email</label>
+              <label>Номер телефона</label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Введите email"
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="+7 (777) 123-45-67"
                 required
               />
+              <small>Формат: +7XXXXXXXXXX</small>
             </div>
 
             <div className="form-group">

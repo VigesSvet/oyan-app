@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Header.css';
 
-const Header = ({ onReportClick }) => {
+const Header = ({ onReportClick, onInfoClick }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,6 +42,13 @@ const Header = ({ onReportClick }) => {
 
         {/* Правая часть: Действия */}
         <div className="nav-actions">
+          {/* Кнопка инфо для мобильной версии */}
+          {location.pathname === '/' && onInfoClick && (
+            <button className="btn-info-mobile" onClick={onInfoClick}>
+              <span className="material-symbols-outlined">info</span>
+            </button>
+          )}
+          
           {user ? (
             <>
               {user.is_admin && (

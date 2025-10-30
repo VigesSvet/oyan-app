@@ -64,8 +64,10 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167] }) => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    // Создаем карту
-    const map = L.map(mapContainer.current).setView(center, 13);
+    // Создаем карту без стандартных кнопок масштабирования
+    const map = L.map(mapContainer.current, {
+      zoomControl: false
+    }).setView(center, 13);
 
     // Добавляем слой OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -200,11 +202,24 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167] }) => {
     setShowHeatmap(!showHeatmap);
   };
 
+  // Функции для управления масштабом
+  const zoomIn = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomIn();
+    }
+  };
+
+  const zoomOut = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomOut();
+    }
+  };
+
   return (
     <div className="map-wrapper">
       <div ref={mapContainer} className="map-container" />
       
-      {/* Переключатель режима */}
+      {/* Переключатель режима и кнопки масштабирования */}
       <div className="map-controls">
         <div className="toggle-container">
           <div className={`toggle-icon ${!showHeatmap ? 'active' : ''}`}>
@@ -216,6 +231,16 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167] }) => {
           <div className={`toggle-icon ${showHeatmap ? 'active' : ''}`}>
             <span className="material-symbols-outlined">local_fire_department</span>
           </div>
+        </div>
+        
+        {/* Кастомные кнопки масштабирования */}
+        <div className="zoom-controls">
+          <button className="zoom-btn" onClick={zoomIn} title="Приблизить">
+            <span className="material-symbols-outlined">add</span>
+          </button>
+          <button className="zoom-btn" onClick={zoomOut} title="Отдалить">
+            <span className="material-symbols-outlined">remove</span>
+          </button>
         </div>
       </div>
 

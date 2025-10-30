@@ -62,7 +62,8 @@ const ProfilePage = () => {
           <h1>Личный кабинет</h1>
           <div className="user-info-card">
             <p><strong>Имя:</strong> {user.username}</p>
-            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>Телефон:</strong> {user.phone_number}</p>
+            <p><strong>Статус:</strong> {user.is_phone_verified ? '✅ Подтвержден' : '⏳ Не подтвержден'}</p>
             <p><strong>Роль:</strong> {user.is_admin ? 'Администратор' : 'Пользователь'}</p>
           </div>
         </div>

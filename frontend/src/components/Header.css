@@ -137,33 +137,62 @@
   box-shadow: var(--shadow);
 }
 
+/* Кнопка инфо для мобильной версии */
+.btn-info-mobile {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--color-text);
+  transition: all 0.2s ease;
+  border-radius: 50%;
+}
+
+.btn-info-mobile:hover {
+  background-color: var(--color-background-light);
+  color: var(--color-primary);
+}
+
+.btn-info-mobile .material-symbols-outlined {
+  font-size: 24px;
+  display: flex;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
   .header-container {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     padding: 12px 16px;
   }
   
   .logo h1 {
-    font-size: 16px;
+    font-size: 20px;
   }
   
+  /* Скрываем навигацию на мобильных */
   .nav {
-    width: 100%;
-    justify-content: space-between;
+    display: none;
   }
   
-  .nav-links {
-    flex-wrap: wrap;
-    gap: 4px;
+  /* Показываем кнопку инфо только на мобильных */
+  .btn-info-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
-  .nav-link {
-    padding: 6px 12px;
-    font-size: 14px;
+  /* Скрываем текст в user-info на мобильных */
+  .user-info span {
+    display: none;
   }
   
-  .nav-link.active::after {
+  .user-info {
+    padding: 6px;
+  }
+  
+  /* Скрываем кнопку "Войти" на мобильных */
+  .nav-actions .btn-outline-primary {
     display: none;
   }
 }

@@ -97,6 +97,98 @@
   font-size: 16px;
 }
 
+/* Расширяемые строки для ReportsPage */
+.expand-cell-reports {
+  width: 40px;
+  text-align: center;
+  padding: 16px 8px !important;
+}
+
+.expand-btn-reports {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding: 4px;
+  transition: transform 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.expand-btn-reports:hover {
+  color: var(--color-text);
+}
+
+.expandable-row-reports.expanded .expand-btn-reports {
+  transform: rotate(90deg);
+}
+
+.expansion-row-reports {
+  background-color: #F8F9FA;
+}
+
+.expansion-row-reports td {
+  padding: 0 !important;
+  border: none !important;
+}
+
+.expansion-content-reports {
+  padding: 20px 12px;
+  background-color: #F8F9FA;
+}
+
+.expansion-item-reports {
+  margin-bottom: 16px;
+}
+
+.expansion-item-reports strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.expansion-item-reports p {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.5;
+  word-break: break-word;
+  font-size: 14px;
+}
+
+.expansion-info-reports {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.info-column-reports {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-column-reports strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-column-reports span {
+  color: var(--color-text);
+  font-size: 14px;
+}
+
 @media (max-width: 768px) {
   .data-table th,
   .data-table td {

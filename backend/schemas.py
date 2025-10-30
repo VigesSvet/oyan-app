@@ -1,29 +1,42 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
 
 # ==================== USER SCHEMAS ====================
 
+class PhoneVerificationRequest(BaseModel):
+    """Схема запроса верификации телефона"""
+    phone_number: str
+
+
+class PhoneVerificationConfirm(BaseModel):
+    """Схема подтверждения верификации телефона"""
+    phone_number: str
+    code: str
+
+
 class UserCreate(BaseModel):
     """Схема создания пользователя"""
-    email: EmailStr
+    phone_number: str
     username: str
     password: str
+    verification_code: str
 
 
 class UserLogin(BaseModel):
     """Схема входа пользователя"""
-    email: EmailStr
+    phone_number: str
     password: str
 
 
 class UserResponse(BaseModel):
     """Схема ответа пользователя"""
     id: int
-    email: str
+    phone_number: str
     username: str
     is_admin: bool
+    is_phone_verified: bool
     created_at: datetime
 
     class Config:
@@ -34,6 +47,12 @@ class Token(BaseModel):
     """Схема токена"""
     access_token: str
     token_type: str
+
+
+class VerificationResponse(BaseModel):
+    """Схема ответа верификации (для демо)"""
+    message: str
+    code: str  # В реальном приложении не возвращайте код!
 
 
 # ==================== REPORT SCHEMAS ====================

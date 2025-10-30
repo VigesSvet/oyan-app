@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
+import BottomNavigation from './components/BottomNavigation';
 import MapPage from './pages/MapPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -31,6 +32,7 @@ const AdminRoute = ({ children }) => {
 
 function AppContent() {
   const [showReportForm, setShowReportForm] = useState(false);
+  const legendOpenHandlerRef = useRef(null);
 
   const handleReportClick = () => {
     setShowReportForm(true);
@@ -41,11 +43,29 @@ function AppContent() {
     // Можно добавить обновление данных
   };
 
+  const handleInfoClick = () => {
+    if (legendOpenHandlerRef.current) {
+      legendOpenHandlerRef.current();
+    }
+  };
+
+  const handleLegendOpen = (handler) => {
+    legendOpenHandlerRef.current = handler;
+  };
+
   return (
     <div className="App">
-      <Header />
+      <Header onInfoClick={handleInfoClick} />
       <Routes>
-        <Route path="/" element={<MapPage onReportClick={handleReportClick} />} />
+        <Route 
+          path="/" 
+          element={
+            <MapPage 
+              onReportClick={handleReportClick}
+              onLegendOpen={handleLegendOpen}
+            />
+          } 
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/news" element={<div className="container"><h1>Новости (в разработке)</h1></div>} />
@@ -126,6 +146,9 @@ function AppContent() {
           } 
         />
       </Routes>
+
+      {/* Нижняя панель навигации для мобильных - отображается на всех страницах */}
+      <BottomNavigation />
 
       {/* Глобальная форма отчета */}
       {showReportForm && (

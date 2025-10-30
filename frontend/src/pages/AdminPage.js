@@ -24,6 +24,7 @@ const AdminPage = () => {
   const [stats, setStats] = useState(null);
   const [selectedReport, setSelectedReport] = useState(null);
   const [adminNotes, setAdminNotes] = useState('');
+  const [expandedRows, setExpandedRows] = useState(new Set());
 
   useEffect(() => {
     fetchReports();
@@ -111,6 +112,16 @@ const AdminPage = () => {
     }
   };
 
+  const toggleRowExpansion = (reportId) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(reportId)) {
+      newExpandedRows.delete(reportId);
+    } else {
+      newExpandedRows.add(reportId);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
   if (loading) {
     return <div className="loading">Загрузка...</div>;
   }
@@ -180,6 +191,7 @@ const AdminPage = () => {
               <table>
                 <thead>
                   <tr>
+                    <th className="expand-cell"></th>
                     <th>ID</th>
                     <th>Тип</th>
                     <th>Адрес</th>
@@ -190,28 +202,79 @@ const AdminPage = () => {
                 </thead>
                 <tbody>
                   {reports.map(report => (
-                    <tr key={report.id}>
-                      <td>{report.id}</td>
-                      <td>{REPORT_TYPE_NAMES[report.report_type]}</td>
-                      <td>{report.address}</td>
-                      <td>
-                        <span className={`badge ${getStatusBadgeClass(report.status)}`}>
-                          {STATUS_NAMES[report.status]}
-                        </span>
-                      </td>
-                      <td>{new Date(report.created_at).toLocaleString('ru-RU')}</td>
-                      <td>
-                        <button 
-                          className="btn-primary small"
-                          onClick={() => {
-                            setSelectedReport(report);
-                            setAdminNotes(report.admin_notes || '');
-                          }}
-                        >
-                          Просмотр
-                        </button>
-                      </td>
-                    </tr>
+                    <React.Fragment key={report.id}>
+                      <tr className={`expandable-row ${expandedRows.has(report.id) ? 'expanded' : ''}`}>
+                        <td className="expand-cell">
+                          <button 
+                            className="expand-btn"
+                            onClick={() => toggleRowExpansion(report.id)}
+                            title={expandedRows.has(report.id) ? 'Свернуть' : 'Развернуть'}
+                          >
+                            ▶
+                          </button>
+                        </td>
+                        <td>{report.id}</td>
+                        <td>{REPORT_TYPE_NAMES[report.report_type]}</td>
+                        <td>{report.address}</td>
+                        <td>
+                          <span className={`badge ${getStatusBadgeClass(report.status)}`}>
+                            {STATUS_NAMES[report.status]}
+                          </span>
+                        </td>
+                        <td>{new Date(report.created_at).toLocaleString('ru-RU')}</td>
+                        <td>
+                          <button 
+                            className="btn-primary small"
+                            onClick={() => {
+                              setSelectedReport(report);
+                              setAdminNotes(report.admin_notes || '');
+                            }}
+                          >
+                            Просмотр
+                          </button>
+                        </td>
+                      </tr>
+                      {expandedRows.has(report.id) && (
+                        <tr className="expansion-row">
+                          <td colSpan="7">
+                            <div className="expansion-content">
+                              {report.description && (
+                                <div className="expansion-item">
+                                  <strong>Описание:</strong>
+                                  <p>{report.description}</p>
+                                </div>
+                              )}
+                              <div className="expansion-info">
+                                {report.incident_date && (
+                                  <div className="info-column">
+                                    <strong>Дата инцидента:</strong>
+                                    <span>{report.incident_date}</span>
+                                  </div>
+                                )}
+                                {report.kuy_number && (
+                                  <div className="info-column">
+                                    <strong>№ КУИ:</strong>
+                                    <span>{report.kuy_number}</span>
+                                  </div>
+                                )}
+                                {report.erdr_number && (
+                                  <div className="info-column">
+                                    <strong>№ ЕРДР:</strong>
+                                    <span>{report.erdr_number}</span>
+                                  </div>
+                                )}
+                                {report.moderator_username && (
+                                  <div className="info-column">
+                                    <strong>Модератор:</strong>
+                                    <span>{report.moderator_username}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>

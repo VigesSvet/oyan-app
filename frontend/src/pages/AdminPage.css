@@ -130,6 +130,98 @@ tbody tr:hover {
   background: var(--color-background-light);
 }
 
+/* Расширяемые строки */
+.expand-cell {
+  width: 40px;
+  text-align: center;
+  padding: 14px 8px !important;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding: 4px;
+  transition: transform 0.2s ease, color 0.2s ease;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expand-btn:hover {
+  color: var(--color-text);
+}
+
+.expandable-row.expanded .expand-btn {
+  transform: rotate(90deg);
+}
+
+.expansion-row {
+  background: var(--color-background-light);
+}
+
+.expansion-row td {
+  padding: 0 !important;
+  border: none !important;
+}
+
+.expansion-content {
+  padding: 20px 12px;
+  background: var(--color-background-light);
+}
+
+.expansion-item {
+  margin-bottom: 16px;
+}
+
+.expansion-item strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.expansion-item p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.expansion-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.info-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-column strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-column span {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
 .modal-actions {
   display: flex;
   gap: 12px;

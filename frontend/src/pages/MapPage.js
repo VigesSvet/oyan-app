@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Map from '../components/Map';
+import LegendModal from '../components/LegendModal';
 import './MapPage.css';
 
-const MapPage = ({ onReportClick }) => {
+const MapPage = ({ onReportClick, onLegendOpen }) => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLegendModal, setShowLegendModal] = useState(false);
 
   useEffect(() => {
     fetchReports();
   }, []);
+
+  // Передаем обработчик открытия легенды в родительский компонент
+  useEffect(() => {
+    if (onLegendOpen) {
+      onLegendOpen(() => setShowLegendModal(true));
+    }
+  }, [onLegendOpen]);
 
   const fetchReports = async () => {
     try {
@@ -30,8 +39,15 @@ const MapPage = ({ onReportClick }) => {
     <div className="map-page">
       <Map reports={reports} />
       <button className="floating-report-btn" onClick={onReportClick}>
-        Сообщить
+        <span className="material-symbols-outlined">edit</span>
+        <span className="btn-text">Сообщить</span>
       </button>
+      
+      {/* Модальное окно с легендой для мобильных */}
+      <LegendModal 
+        isOpen={showLegendModal} 
+        onClose={() => setShowLegendModal(false)} 
+      />
     </div>
   );
 };

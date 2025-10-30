@@ -25,6 +25,7 @@ const ReportsPage = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [pendingCount, setPendingCount] = useState(0);
+  const [expandedRows, setExpandedRows] = useState(new Set());
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,6 +61,17 @@ const ReportsPage = () => {
       case 'rejected': return 'status-rejected';
       default: return '';
     }
+  };
+
+  const toggleRowExpansion = (reportId, e) => {
+    e.stopPropagation();
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(reportId)) {
+      newExpandedRows.delete(reportId);
+    } else {
+      newExpandedRows.add(reportId);
+    }
+    setExpandedRows(newExpandedRows);
   };
 
   const handleRowClick = (reportId) => {
@@ -115,6 +127,7 @@ const ReportsPage = () => {
           <table className="data-table">
             <thead>
               <tr>
+                <th className="expand-cell-reports"></th>
                 <th>ID</th>
                 <th>ТИП</th>
                 <th>ДАТА</th>
@@ -125,26 +138,70 @@ const ReportsPage = () => {
             </thead>
             <tbody>
               {reports.map((report) => (
-                <tr 
-                  key={report.id}
-                  onClick={() => handleRowClick(report.id)}
-                  className="clickable-row"
-                >
-                  <td className="id-cell">
-                    <a href={`/admin/reports/${report.id}`} onClick={(e) => e.preventDefault()}>
-                      #{report.id}
-                    </a>
-                  </td>
-                  <td>{REPORT_TYPE_NAMES[report.report_type]}</td>
-                  <td>{new Date(report.created_at).toLocaleDateString('ru-RU')}</td>
-                  <td className="address-cell">{report.address}</td>
-                  <td>
-                    <span className={`status-badge ${getStatusBadgeClass(report.status)}`}>
-                      {STATUS_NAMES[report.status]}
-                    </span>
-                  </td>
-                  <td>{report.moderator_username || '—'}</td>
-                </tr>
+                <React.Fragment key={report.id}>
+                  <tr 
+                    onClick={() => handleRowClick(report.id)}
+                    className={`clickable-row expandable-row-reports ${expandedRows.has(report.id) ? 'expanded' : ''}`}
+                  >
+                    <td className="expand-cell-reports">
+                      <button 
+                        className="expand-btn-reports"
+                        onClick={(e) => toggleRowExpansion(report.id, e)}
+                        title={expandedRows.has(report.id) ? 'Свернуть' : 'Развернуть'}
+                      >
+                        ▶
+                      </button>
+                    </td>
+                    <td className="id-cell">
+                      <a href={`/admin/reports/${report.id}`} onClick={(e) => e.preventDefault()}>
+                        #{report.id}
+                      </a>
+                    </td>
+                    <td>{REPORT_TYPE_NAMES[report.report_type]}</td>
+                    <td>{new Date(report.created_at).toLocaleDateString('ru-RU')}</td>
+                    <td className="address-cell">{report.address}</td>
+                    <td>
+                      <span className={`status-badge ${getStatusBadgeClass(report.status)}`}>
+                        {STATUS_NAMES[report.status]}
+                      </span>
+                    </td>
+                    <td>{report.moderator_username || '—'}</td>
+                  </tr>
+                  {expandedRows.has(report.id) && (
+                    <tr className="expansion-row-reports">
+                      <td colSpan="7">
+                        <div className="expansion-content-reports">
+                          {report.description && (
+                            <div className="expansion-item-reports">
+                              <strong>Описание:</strong>
+                              <p>{report.description}</p>
+                            </div>
+                          )}
+                          <div className="expansion-info-reports">
+                            {report.incident_date && (
+                              <div className="info-column-reports">
+                                <strong>Дата инцидента:</strong>
+                                <span>{report.incident_date}</span>
+                              </div>
+                            )}
+                            {report.kuy_number && (
+                              <div className="info-column-reports">
+                                <strong>№ КУИ:</strong>
+                                <span>{report.kuy_number}</span>
+                              </div>
+                            )}
+                            {report.erdr_number && (
+                              <div className="info-column-reports">
+                                <strong>№ ЕРДР:</strong>
+                                <span>{report.erdr_number}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>
