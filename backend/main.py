@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import random
 import string
 
-from database import engine, get_db, Base
+from database import get_db
 from models import User, Report, ReportStatus, ReportType, News, BonusRedemption, BonusRedemptionStatus
 from schemas import (
     UserCreate, UserLogin, UserResponse,
@@ -21,9 +21,6 @@ from auth import (
     get_password_hash, verify_password,
     create_access_token, get_current_user, get_current_admin
 )
-
-# Создание таблиц
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="OYUN - Карта Наркоситуаций API")
 

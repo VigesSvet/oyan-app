@@ -15,8 +15,8 @@ const REPORT_TYPE_NAMES = {
 
 const STATUS_NAMES = {
   new: 'Ожидает',
-  rejected: 'Отклонен'
-  confirmed: 'Подтвержден',
+  rejected: 'Отклонен',
+  confirmed: 'Подтвержден'
 };
 
 const ReportDetailPage = () => {

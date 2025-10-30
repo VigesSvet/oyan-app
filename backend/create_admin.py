@@ -3,12 +3,9 @@
 Использование: python create_admin.py
 """
 from sqlalchemy.orm import Session
-from database import SessionLocal, engine, Base
+from database import SessionLocal
 from models import User
 from auth import get_password_hash
-
-# Создание таблиц
-Base.metadata.create_all(bind=engine)
 
 def create_admin():
     db: Session = SessionLocal()

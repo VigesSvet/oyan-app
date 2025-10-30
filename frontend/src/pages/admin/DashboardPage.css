@@ -187,9 +187,9 @@
 }
 
 .legend-color {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 
