@@ -261,7 +261,7 @@ const ProfilePage = () => {
                   
                   {report.photo_url && (
                     <img 
-                      src={`http://localhost:8000${report.photo_url}`} 
+                      src={`https://oyan-app.onrender.com${report.photo_url}`} 
                       alt="Фото" 
                       className="report-photo"
                     />
@@ -325,7 +325,7 @@ const ProfilePage = () => {
                   <div>
                     <strong>Фото:</strong>
                     <img 
-                      src={`http://localhost:8000${selectedReport.photo_url}`} 
+                      src={`https://oyan-app.onrender.com${selectedReport.photo_url}`} 
                       alt="Фото" 
                       className="modal-photo"
                     />

@@ -113,7 +113,7 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167], isStatic = fal
         ${report.incident_date ? `<p style="margin: 5px 0;"><strong>Дата инцидента:</strong> ${report.incident_date}</p>` : ''}
         ${report.kuy_number ? `<p style="margin: 5px 0;"><strong>№ КУИ:</strong> ${report.kuy_number}</p>` : ''}
         ${report.erdr_number ? `<p style="margin: 5px 0;"><strong>№ ЕРДР:</strong> ${report.erdr_number}</p>` : ''}
-        ${report.photo_url ? `<img src="http://localhost:8000${report.photo_url}" alt="Фото" style="max-width: 100%; margin-top: 10px; border-radius: 5px;" />` : ''}
+        ${report.photo_url ? `<img src="https://oyan-app.onrender.com${report.photo_url}" alt="Фото" style="max-width: 100%; margin-top: 10px; border-radius: 5px;" />` : ''}
       </div>
     `;
 

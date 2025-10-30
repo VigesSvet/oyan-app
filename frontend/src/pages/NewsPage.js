@@ -13,7 +13,7 @@ const NewsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:8000/api/news');
+      const response = await fetch('https://oyan-app.onrender.com/api/news');
       
       if (!response.ok) {
         throw new Error('Ошибка при загрузке новостей');

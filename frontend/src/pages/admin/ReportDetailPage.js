@@ -126,7 +126,7 @@ const ReportDetailPage = () => {
                 <h3>Приложенные фото</h3>
                 <div className="photo-gallery">
                   <img 
-                    src={`http://localhost:8000${report.photo_url}`} 
+                    src={`https://oyan-app.onrender.com${report.photo_url}`} 
                     alt="Фото" 
                     className="report-photo"
                   />

@@ -23,7 +23,7 @@ const NewsPage = () => {
     setError(null);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8000/api/admin/news', {
+      const response = await fetch('https://oyan-app.onrender.com/api/admin/news', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -130,7 +130,7 @@ const NewsPage = () => {
         const formDataWithFile = new FormData();
         formDataWithFile.append('file', imageFile);
         
-        const uploadResponse = await fetch('http://localhost:8000/api/upload', {
+        const uploadResponse = await fetch('https://oyan-app.onrender.com/api/upload', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -150,7 +150,7 @@ const NewsPage = () => {
       let response;
       if (editingNews) {
         // Обновление существующей новости
-        response = await fetch(`http://localhost:8000/api/admin/news/${editingNews.id}`, {
+        response = await fetch(`https://oyan-app.onrender.com/api/admin/news/${editingNews.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -160,7 +160,7 @@ const NewsPage = () => {
         });
       } else {
         // Создание новой новости
-        response = await fetch('http://localhost:8000/api/admin/news', {
+        response = await fetch('https://oyan-app.onrender.com/api/admin/news', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ const NewsPage = () => {
     const token = localStorage.getItem('token');
     
     try {
-      const response = await fetch(`http://localhost:8000/api/admin/news/${newsId}`, {
+      const response = await fetch(`https://oyan-app.onrender.com/api/admin/news/${newsId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
