@@ -13,6 +13,12 @@ const REPORT_TYPE_NAMES = {
   other: 'Иные сведения'
 };
 
+const STATUS_NAMES = {
+  new: 'Ожидает',
+  confirmed: 'Подтвержден',
+  rejected: 'Отклонен'
+};
+
 const ModerationPage = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +61,7 @@ const ModerationPage = () => {
       <div className="moderation-table-wrapper">
         {reports.length === 0 ? (
           <div className="no-reports">
-            <p>✅ Нет обращений, ожидающих модерации</p>
+            <p>Нет обращений, ожидающих модерации</p>
           </div>
         ) : (
           <table className="data-table">
@@ -84,7 +90,7 @@ const ModerationPage = () => {
                   <td>{new Date(report.created_at).toLocaleDateString('ru-RU')}</td>
                   <td className="address-cell">{report.address}</td>
                   <td>
-                    <span className="status-badge status-pending">Pending</span>
+                    <span className="status-badge status-pending">{STATUS_NAMES[report.status] || 'Ожидает'}</span>
                   </td>
                 </tr>
               ))}

@@ -14,9 +14,9 @@ const REPORT_TYPE_NAMES = {
 };
 
 const STATUS_NAMES = {
-  new: 'Pending',
-  confirmed: 'Verified',
-  rejected: 'Rejected'
+  new: 'Ожидает',
+  confirmed: 'Подтвержден',
+  rejected: 'Отклонен'
 };
 
 const ReportDetailPage = () => {
@@ -106,21 +106,20 @@ const ReportDetailPage = () => {
   return (
     <AdminLayout>
       <div className="report-detail-page">
-        <h1>Модерация обращения #{report.id}</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <h1 style={{ margin: 0 }}>Модерация обращения #{report.id}</h1>
+          <button 
+            className="btn-outline"
+            onClick={() => navigate('/admin/moderation')}
+            style={{ padding: '8px 16px' }}
+          >
+            ← Назад
+          </button>
+        </div>
 
         <div className="detail-layout">
           {/* Левая колонка (60%) */}
           <div className="detail-left">
-            {/* Карточка с картой */}
-            <div className="detail-card">
-              <h3>📍 Карта</h3>
-              <div className="map-placeholder">
-                <p>Здесь будет встроенная 2GIS карта с маркером</p>
-                <p><strong>Координаты:</strong> {report.latitude}, {report.longitude}</p>
-                <p><strong>Адрес:</strong> {report.address}</p>
-              </div>
-            </div>
-
             {/* Приложенные фото */}
             {report.photo_url && (
               <div className="detail-card">
@@ -137,8 +136,10 @@ const ReportDetailPage = () => {
 
             {/* Описание */}
             <div className="detail-card">
-              <h3>📝 Описание от пользователя</h3>
+              <h3>Описание от пользователя</h3>
               <p><strong>Тип:</strong> {REPORT_TYPE_NAMES[report.report_type]}</p>
+              <p><strong>Адрес:</strong> {report.address}</p>
+              <p><strong>Координаты:</strong> {report.latitude}, {report.longitude}</p>
               <p><strong>Описание:</strong></p>
               <div className="description-box">
                 {report.description}
@@ -153,7 +154,7 @@ const ReportDetailPage = () => {
           {/* Правая колонка (40%) */}
           <div className="detail-right">
             <div className="detail-card decision-card">
-              <h3>✅ Решение</h3>
+              <h3>Решение</h3>
               
               <div className="form-group">
                 <label>Текущий статус:</label>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { handleApiError } from '../utils/errorHandler';
+import { formatPhoneNumber, getCleanPhoneNumber } from '../utils/phoneFormatter';
 import './AuthPages.css';
 
 const LoginPage = () => {
@@ -13,13 +14,19 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const handlePhoneChange = (e) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setPhoneNumber(formatted);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      await login(phoneNumber, password);
+      const cleanPhone = getCleanPhoneNumber(phoneNumber);
+      await login(cleanPhone, password);
       navigate('/profile');
     } catch (err) {
       console.error('Login error:', err.response?.data);
@@ -43,11 +50,12 @@ const LoginPage = () => {
               <input
                 type="tel"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={handlePhoneChange}
                 placeholder="+7 (777) 123-45-67"
+                maxLength="18"
                 required
               />
-              <small>Формат: +7XXXXXXXXXX</small>
+              <small>Формат: +7 (XXX) XXX-XX-XX</small>
             </div>
 
             <div className="form-group">

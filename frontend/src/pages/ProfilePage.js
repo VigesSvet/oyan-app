@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import './ProfilePage.css';
@@ -31,7 +32,8 @@ const BONUS_REWARDS = [
 ];
 
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState(null);
@@ -42,6 +44,11 @@ const ProfilePage = () => {
   const [contactInfo, setContactInfo] = useState('');
   const [redemptions, setRedemptions] = useState([]);
   const [redeeming, setRedeeming] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   useEffect(() => {
     fetchMyReports();
@@ -139,7 +146,12 @@ const ProfilePage = () => {
     <div className="profile-page">
       <div className="container">
         <div className="profile-header">
-          <h1>Личный кабинет</h1>
+          <div className="profile-header-top">
+            <h1>Личный кабинет</h1>
+            <button className="btn-logout btn-logout-desktop" onClick={handleLogout}>
+              Выход
+            </button>
+          </div>
           <div className="user-info-card">
             <p><strong>Имя:</strong> {user.username}</p>
             <p><strong>Телефон:</strong> {user.phone_number}</p>
@@ -272,6 +284,12 @@ const ProfilePage = () => {
               ))}
             </div>
           )}
+        </div>
+
+        <div className="profile-footer-mobile">
+          <button className="btn-logout btn-logout-mobile" onClick={handleLogout}>
+            Выход
+          </button>
         </div>
 
         {selectedReport && (

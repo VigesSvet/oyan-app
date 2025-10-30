@@ -34,9 +34,6 @@ const Header = ({ onReportClick, onInfoClick }) => {
             <Link to="/news" className={`nav-link ${isActive('/news')}`}>
               Новости
             </Link>
-            <Link to="/about" className={`nav-link ${isActive('/about')}`}>
-              О проекте
-            </Link>
           </div>
         </nav>
 

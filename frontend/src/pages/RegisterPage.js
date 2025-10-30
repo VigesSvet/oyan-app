@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { handleApiError } from '../utils/errorHandler';
+import { formatPhoneNumber, getCleanPhoneNumber } from '../utils/phoneFormatter';
 import axios from 'axios';
 import './AuthPages.css';
 
@@ -28,14 +29,23 @@ const RegisterPage = () => {
     });
   };
 
+  const handlePhoneChange = (e) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setFormData({
+      ...formData,
+      phone_number: formatted
+    });
+  };
+
   const handleSendCode = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
+      const cleanPhone = getCleanPhoneNumber(formData.phone_number);
       const response = await axios.post('/api/auth/send-code', {
-        phone_number: formData.phone_number
+        phone_number: cleanPhone
       });
       
       setDemoCode(response.data.code); // ДЕМО: показываем код
@@ -66,8 +76,9 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
+      const cleanPhone = getCleanPhoneNumber(formData.phone_number);
       await register(
-        formData.phone_number,
+        cleanPhone,
         formData.username,
         formData.password,
         formData.verification_code
@@ -99,11 +110,12 @@ const RegisterPage = () => {
                   type="tel"
                   name="phone_number"
                   value={formData.phone_number}
-                  onChange={handleChange}
+                  onChange={handlePhoneChange}
                   placeholder="+7 (777) 123-45-67"
+                  maxLength="18"
                   required
                 />
-                <small>Формат: +7XXXXXXXXXX</small>
+                <small>Формат: +7 (XXX) XXX-XX-XX</small>
               </div>
 
               <button type="submit" className="btn-primary full-width" disabled={loading}>

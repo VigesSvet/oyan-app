@@ -53,7 +53,7 @@ const createCustomIcon = (color) => {
   });
 };
 
-const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167] }) => {
+const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167], isStatic = false }) => {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const markerClusterGroupRef = useRef(null);
@@ -66,7 +66,12 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167] }) => {
 
     // Создаем карту без стандартных кнопок масштабирования
     const map = L.map(mapContainer.current, {
-      zoomControl: false
+      zoomControl: false,
+      dragging: !isStatic,
+      touchZoom: !isStatic,
+      doubleClickZoom: !isStatic,
+      scrollWheelZoom: !isStatic,
+      keyboard: !isStatic
     }).setView(center, 13);
 
     // Добавляем слой OpenStreetMap
@@ -193,6 +198,11 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167] }) => {
         const marker = createMarker(report);
         markerClusterGroup.addLayer(marker);
       });
+
+      // Автоматически фокусируемся на маркерах
+      if (markerClusterGroup.getLayers().length > 0) {
+        mapRef.current.fitBounds(markerClusterGroup.getBounds(), { padding: [50, 50] });
+      }
     }
 
   }, [reports, showHeatmap, onMarkerClick]);
@@ -219,33 +229,35 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167] }) => {
     <div className="map-wrapper">
       <div ref={mapContainer} className="map-container" />
       
-      {/* Переключатель режима и кнопки масштабирования */}
-      <div className="map-controls">
-        <div className="toggle-container">
-          <div className={`toggle-icon ${!showHeatmap ? 'active' : ''}`}>
-            <span className="material-symbols-outlined">location_on</span>
+      {/* Переключатель режима и кнопки масштабирования (только в интерактивном режиме) */}
+      {!isStatic && (
+        <div className="map-controls">
+          <div className="toggle-container">
+            <div className={`toggle-icon ${!showHeatmap ? 'active' : ''}`}>
+              <span className="material-symbols-outlined">location_on</span>
+            </div>
+            <div className="toggle-switch" onClick={toggleHeatmap}>
+              <div className={`toggle-slider ${showHeatmap ? 'active' : ''}`}></div>
+            </div>
+            <div className={`toggle-icon ${showHeatmap ? 'active' : ''}`}>
+              <span className="material-symbols-outlined">local_fire_department</span>
+            </div>
           </div>
-          <div className="toggle-switch" onClick={toggleHeatmap}>
-            <div className={`toggle-slider ${showHeatmap ? 'active' : ''}`}></div>
-          </div>
-          <div className={`toggle-icon ${showHeatmap ? 'active' : ''}`}>
-            <span className="material-symbols-outlined">local_fire_department</span>
+          
+          {/* Кастомные кнопки масштабирования */}
+          <div className="zoom-controls">
+            <button className="zoom-btn" onClick={zoomIn} title="Приблизить">
+              <span className="material-symbols-outlined">add</span>
+            </button>
+            <button className="zoom-btn" onClick={zoomOut} title="Отдалить">
+              <span className="material-symbols-outlined">remove</span>
+            </button>
           </div>
         </div>
-        
-        {/* Кастомные кнопки масштабирования */}
-        <div className="zoom-controls">
-          <button className="zoom-btn" onClick={zoomIn} title="Приблизить">
-            <span className="material-symbols-outlined">add</span>
-          </button>
-          <button className="zoom-btn" onClick={zoomOut} title="Отдалить">
-            <span className="material-symbols-outlined">remove</span>
-          </button>
-        </div>
-      </div>
+      )}
 
-      {/* Легенда */}
-      {!showHeatmap && (
+      {/* Легенда (только в интерактивном режиме) */}
+      {!isStatic && !showHeatmap && (
         <div className="map-legend">
           <h4>Легенда:</h4>
           {Object.entries(MARKER_COLORS).map(([type, color]) => (

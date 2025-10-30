@@ -69,7 +69,7 @@ const AdminMapPage = () => {
                 checked={filters.pending}
                 onChange={() => handleFilterChange('pending')}
               />
-              <span className="filter-label">Pending</span>
+              <span className="filter-label">Ожидают</span>
             </label>
             <label className="filter-checkbox">
               <input
@@ -77,7 +77,7 @@ const AdminMapPage = () => {
                 checked={filters.confirmed}
                 onChange={() => handleFilterChange('confirmed')}
               />
-              <span className="filter-label">Verified</span>
+              <span className="filter-label">Подтвержденные</span>
             </label>
             <label className="filter-checkbox">
               <input
@@ -85,7 +85,7 @@ const AdminMapPage = () => {
                 checked={filters.rejected}
                 onChange={() => handleFilterChange('rejected')}
               />
-              <span className="filter-label">Rejected</span>
+              <span className="filter-label">Отклоненные</span>
             </label>
             <label className="filter-checkbox">
               <input

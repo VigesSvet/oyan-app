@@ -23,13 +23,15 @@ import './App.css';
 
 // Компонент для защищенных маршрутов
 const PrivateRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return null; // Ждём пока проверится аутентификация
   return user ? children : <Navigate to="/login" />;
 };
 
 // Компонент для админских маршрутов
 const AdminRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return null; // Ждём пока проверится аутентификация
   return user && user.is_admin ? children : <Navigate to="/" />;
 };
 
@@ -72,7 +74,6 @@ function AppContent() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/news" element={<PublicNewsPage />} />
-        <Route path="/about" element={<div className="container"><h1>О проекте (в разработке)</h1></div>} />
         <Route 
           path="/profile" 
           element={

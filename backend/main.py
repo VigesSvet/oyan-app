@@ -13,7 +13,7 @@ from models import User, Report, ReportStatus, ReportType, News, BonusRedemption
 from schemas import (
     UserCreate, UserLogin, UserResponse,
     ReportCreate, ReportResponse, ReportUpdate,
-    Token, PhoneVerificationRequest, VerificationResponse
+    Token, PhoneVerificationRequest, VerificationResponse,
     NewsCreate, NewsUpdate, NewsResponse,
     BonusRedemptionCreate, BonusRedemptionResponse,
 )

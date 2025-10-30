@@ -272,3 +272,16 @@ input::placeholder, textarea::placeholder {
   color: var(--color-text);
   transform: none;
 }
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+}
