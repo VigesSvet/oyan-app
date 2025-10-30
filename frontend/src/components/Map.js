@@ -123,76 +123,65 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167] }) => {
     return marker;
   };
 
-  // Добавление маркеров на карту
   useEffect(() => {
     if (!mapRef.current || !markerClusterGroupRef.current || !reports) return;
 
     const markerClusterGroup = markerClusterGroupRef.current;
     
-    // Удаляем старые маркеры
     markerClusterGroup.clearLayers();
 
     if (showHeatmap) {
-      // Режим тепловой карты
       if (heatmapLayerRef.current) {
         mapRef.current.removeLayer(heatmapLayerRef.current);
       }
 
-      // Загружаем Leaflet.heat динамически
-      if (!window.L.heatLayer) {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.min.js';
-        script.onload = () => {
-          const heatData = reports.map(report => [
+      const locationCounts = {};
+      reports.forEach(report => {
+        const key = `${report.latitude.toFixed(4)},${report.longitude.toFixed(4)}`;
+        locationCounts[key] = (locationCounts[key] || 0) + 1;
+      });
+
+      const maxCount = Math.max(...Object.values(locationCounts));
+
+      const createHeatmap = () => {
+        const heatData = reports.map(report => {
+          const key = `${report.latitude.toFixed(4)},${report.longitude.toFixed(4)}`;
+          const count = locationCounts[key];
+          return [
             report.latitude, 
             report.longitude,
-            1 // вес точки
-          ]);
-
-          const heatmapLayer = window.L.heatLayer(heatData, {
-            radius: 40,
-            blur: 30,
-            maxZoom: 1,
-            max: 1,
-            gradient: {
-              0.0: '#0000ff',
-              0.25: '#00ffff',
-              0.5: '#00ff00',
-              0.75: '#ffff00',
-              1.0: '#ff0000'
-            }
-          });
-
-          heatmapLayer.addTo(mapRef.current);
-          heatmapLayerRef.current = heatmapLayer;
-        };
-        document.head.appendChild(script);
-      } else {
-        const heatData = reports.map(report => [
-          report.latitude, 
-          report.longitude,
-          1
-        ]);
+            count / maxCount
+          ];
+        });
 
         const heatmapLayer = window.L.heatLayer(heatData, {
-          radius: 40,
-          blur: 30,
-          maxZoom: 1,
-          max: 1,
+          radius: 25,
+          blur: 15,
+          maxZoom: 17,
+          max: 1.0,
+          minOpacity: 0.5,
           gradient: {
-            0.0: '#0000ff',
-            0.25: '#00ffff',
-            0.5: '#00ff00',
-            0.75: '#ffff00',
-            1.0: '#ff0000'
+            0.0: 'blue',
+            0.5: 'lime',
+            1.0: 'red'
           }
         });
 
         heatmapLayer.addTo(mapRef.current);
         heatmapLayerRef.current = heatmapLayer;
+      };
+
+      if (!window.L.heatLayer) {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js';
+        script.onload = () => {
+          createHeatmap();
+        };
+        document.head.appendChild(script);
+      } else {
+        createHeatmap();
       }
     } else {
-      // Режим кластеризованных маркеров
       if (heatmapLayerRef.current) {
         mapRef.current.removeLayer(heatmapLayerRef.current);
         heatmapLayerRef.current = null;
@@ -215,14 +204,19 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167] }) => {
     <div className="map-wrapper">
       <div ref={mapContainer} className="map-container" />
       
-      {/* Кнопка переключения режима */}
+      {/* Переключатель режима */}
       <div className="map-controls">
-        <button 
-          className={`control-button ${showHeatmap ? 'active' : ''}`}
-          onClick={toggleHeatmap}
-        >
-          {showHeatmap ? '🗺️ Маркеры' : '🔥 Тепловая карта'}
-        </button>
+        <div className="toggle-container">
+          <div className={`toggle-icon ${!showHeatmap ? 'active' : ''}`}>
+            <span className="material-symbols-outlined">location_on</span>
+          </div>
+          <div className="toggle-switch" onClick={toggleHeatmap}>
+            <div className={`toggle-slider ${showHeatmap ? 'active' : ''}`}></div>
+          </div>
+          <div className={`toggle-icon ${showHeatmap ? 'active' : ''}`}>
+            <span className="material-symbols-outlined">local_fire_department</span>
+          </div>
+        </div>
       </div>
 
       {/* Легенда */}

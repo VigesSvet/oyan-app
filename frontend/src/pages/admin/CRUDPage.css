@@ -1,0 +1,31 @@
+/* Общие стили для CRUD страниц (Новости, Призы) */
+
+.crud-header {
+  margin-bottom: 24px;
+}
+
+.crud-placeholder {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow);
+  border: 2px dashed #DEE2E6;
+}
+
+.crud-placeholder p {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 20px 0;
+}
+
+.crud-placeholder ul {
+  margin: 0;
+  padding-left: 24px;
+  color: var(--color-text-secondary);
+}
+
+.crud-placeholder li {
+  margin-bottom: 8px;
+  font-size: 14px;
+}

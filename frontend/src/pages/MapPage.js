@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Map from '../components/Map';
-import ReportForm from '../components/ReportForm';
 import './MapPage.css';
 
-const MapPage = () => {
+const MapPage = ({ onReportClick }) => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showReportForm, setShowReportForm] = useState(false);
 
   useEffect(() => {
     fetchReports();
@@ -24,31 +22,16 @@ const MapPage = () => {
     }
   };
 
-  const handleReportSuccess = () => {
-    fetchReports();
-  };
-
   if (loading) {
-    return <div className="loading">Загрузка карты...</div>;
+    return <div className="loading">Загрузка карты</div>;
   }
 
   return (
     <div className="map-page">
       <Map reports={reports} />
-      
-      <button 
-        className="add-report-btn btn-primary"
-        onClick={() => setShowReportForm(true)}
-      >
-        + Подать обращение
+      <button className="floating-report-btn" onClick={onReportClick}>
+        Сообщить
       </button>
-
-      {showReportForm && (
-        <ReportForm
-          onClose={() => setShowReportForm(false)}
-          onSuccess={handleReportSuccess}
-        />
-      )}
     </div>
   );
 };

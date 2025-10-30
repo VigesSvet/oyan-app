@@ -1,45 +1,69 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Header.css';
 
-const Header = () => {
+const Header = ({ onReportClick }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
 
+  const isActive = (path) => {
+    return location.pathname === path ? 'active' : '';
+  };
+
   return (
     <header className="header">
       <div className="header-container">
+        {/* Левая часть: Логотип */}
         <Link to="/" className="logo">
-          <h1>OYUN - Карта Наркоситуаций</h1>
+          <h1>OYAN</h1>
         </Link>
         
+        {/* Центр: Навигация */}
         <nav className="nav">
-          <Link to="/" className="nav-link">Карта</Link>
-          
+          <div className="nav-links">
+            <Link to="/" className={`nav-link ${isActive('/')}`}>
+              Карта
+            </Link>
+            <Link to="/news" className={`nav-link ${isActive('/news')}`}>
+              Новости
+            </Link>
+            <Link to="/about" className={`nav-link ${isActive('/about')}`}>
+              О проекте
+            </Link>
+          </div>
+        </nav>
+
+        {/* Правая часть: Действия */}
+        <div className="nav-actions">
           {user ? (
             <>
-              <Link to="/profile" className="nav-link">Личный кабинет</Link>
               {user.is_admin && (
-                <Link to="/admin" className="nav-link">Админ-панель</Link>
+                <Link to="/admin" className="btn-outline-primary">
+                  Админ-панель
+                </Link>
               )}
-              <span className="user-info">👤 {user.username}</span>
-              <button onClick={handleLogout} className="btn-secondary">
-                Выйти
-              </button>
+              <Link to="/profile" className="user-info">
+                <div className="user-avatar">
+                  {user.username.charAt(0).toUpperCase()}
+                </div>
+                <span>{user.username}</span>
+              </Link>
             </>
           ) : (
             <>
-              <Link to="/login" className="nav-link">Вход</Link>
-              <Link to="/register" className="nav-link">Регистрация</Link>
+              <Link to="/login">
+                <button className="btn-outline-primary">Войти</button>
+              </Link>
             </>
           )}
-        </nav>
+        </div>
       </div>
     </header>
   );

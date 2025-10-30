@@ -1,0 +1,181 @@
+/* Страница детального просмотра обращения */
+
+.report-detail-page {
+  max-width: 1400px;
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 0.6fr;
+  gap: 24px;
+}
+
+.detail-card {
+  background: white;
+  border-radius: var(--border-radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+
+.detail-card:last-child {
+  margin-bottom: 0;
+}
+
+.detail-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 16px 0;
+}
+
+/* Карта */
+.map-placeholder {
+  background: #F8F9FA;
+  border: 2px dashed #DEE2E6;
+  border-radius: var(--border-radius);
+  padding: 40px;
+  text-align: center;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.map-placeholder p {
+  margin: 4px 0;
+  color: var(--color-text-secondary);
+}
+
+/* Фото */
+.photo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.report-photo {
+  width: 100%;
+  border-radius: var(--border-radius);
+  border: 1px solid #DEE2E6;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.report-photo:hover {
+  transform: scale(1.05);
+}
+
+/* Описание */
+.description-box {
+  background: #F8F9FA;
+  padding: 16px;
+  border-radius: var(--border-radius);
+  border: 1px solid #DEE2E6;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin: 8px 0;
+}
+
+/* Карточка решения */
+.decision-card {
+  position: sticky;
+  top: 24px;
+}
+
+.status-badge-large {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge-large.status-new {
+  background-color: #FFF3CD;
+  color: #856404;
+  border: 1px solid #FFC107;
+}
+
+.status-badge-large.status-confirmed {
+  background-color: #D1E7DD;
+  color: #0F5132;
+  border: 1px solid #198754;
+}
+
+.status-badge-large.status-rejected {
+  background-color: #F8D7DA;
+  color: #842029;
+  border: 1px solid #DC3545;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #DEE2E6;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.btn-outline-danger {
+  background: white;
+  color: #DC3545;
+  border: 2px solid #DC3545;
+  padding: 12px 20px;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-danger:hover:not(:disabled) {
+  background-color: #DC3545;
+  color: white;
+}
+
+.btn-outline-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+  .detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .decision-card {
+    position: static;
+  }
+}
