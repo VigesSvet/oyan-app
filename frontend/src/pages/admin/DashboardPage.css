@@ -43,19 +43,19 @@
 
 /* Цветные акценты для KPI */
 .kpi-total {
-  border-left-color: #0D6EFD;
+  border-left-color: #6B95B3;
 }
 
 .kpi-new {
-  border-left-color: #FFC107;
+  border-left-color: #D4A574;
 }
 
 .kpi-confirmed {
-  border-left-color: #198754;
+  border-left-color: #8FB59C;
 }
 
 .kpi-rejected {
-  border-left-color: #DC3545;
+  border-left-color: #C97589;
 }
 
 /* Дополнительные метрики */

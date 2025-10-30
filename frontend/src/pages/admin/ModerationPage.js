@@ -55,7 +55,7 @@ const ModerationPage = () => {
       <div className="moderation-table-wrapper">
         {reports.length === 0 ? (
           <div className="no-reports">
-            <p>✅ Нет обращений, ожидающих модерации</p>
+            <p>Нет обращений, ожидающих модерации</p>
           </div>
         ) : (
           <table className="data-table">
@@ -84,7 +84,7 @@ const ModerationPage = () => {
                   <td>{new Date(report.created_at).toLocaleDateString('ru-RU')}</td>
                   <td className="address-cell">{report.address}</td>
                   <td>
-                    <span className="status-badge status-pending">Pending</span>
+                    <span className="status-badge status-pending">Новое</span>
                   </td>
                 </tr>
               ))}

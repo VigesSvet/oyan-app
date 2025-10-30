@@ -340,20 +340,20 @@ const AdminPage = () => {
                     onClick={() => handleStatusUpdate(selectedReport.id, 'confirmed')}
                     disabled={selectedReport.status === 'confirmed'}
                   >
-                    ✓ Подтвердить
+                    Подтвердить
                   </button>
                   <button 
                     className="btn-danger"
                     onClick={() => handleStatusUpdate(selectedReport.id, 'rejected')}
                     disabled={selectedReport.status === 'rejected'}
                   >
-                    ✕ Отклонить
+                    Отклонить
                   </button>
                   <button 
                     className="btn-danger"
                     onClick={() => handleDelete(selectedReport.id)}
                   >
-                    🗑 Удалить
+                    Удалить
                   </button>
                 </div>
               </div>

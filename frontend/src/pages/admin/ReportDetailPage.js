@@ -14,9 +14,9 @@ const REPORT_TYPE_NAMES = {
 };
 
 const STATUS_NAMES = {
-  new: 'Pending',
-  confirmed: 'Verified',
-  rejected: 'Rejected'
+  new: 'Новое',
+  confirmed: 'Верифицировано',
+  rejected: 'Отклонено'
 };
 
 const ReportDetailPage = () => {
@@ -113,7 +113,7 @@ const ReportDetailPage = () => {
           <div className="detail-left">
             {/* Карточка с картой */}
             <div className="detail-card">
-              <h3>📍 Карта</h3>
+              <h3>Карта</h3>
               <div className="map-placeholder">
                 <p>Здесь будет встроенная 2GIS карта с маркером</p>
                 <p><strong>Координаты:</strong> {report.latitude}, {report.longitude}</p>
@@ -124,7 +124,7 @@ const ReportDetailPage = () => {
             {/* Приложенные фото */}
             {report.photo_url && (
               <div className="detail-card">
-                <h3>📸 Приложенные фото</h3>
+                <h3>Приложенные фото</h3>
                 <div className="photo-gallery">
                   <img 
                     src={`http://localhost:8000${report.photo_url}`} 
@@ -137,7 +137,7 @@ const ReportDetailPage = () => {
 
             {/* Описание */}
             <div className="detail-card">
-              <h3>📝 Описание от пользователя</h3>
+              <h3>Описание от пользователя</h3>
               <p><strong>Тип:</strong> {REPORT_TYPE_NAMES[report.report_type]}</p>
               <p><strong>Описание:</strong></p>
               <div className="description-box">
@@ -221,7 +221,7 @@ const ReportDetailPage = () => {
                 onClick={handleDelete}
                 style={{ width: '100%', marginTop: '12px' }}
               >
-                🗑 Удалить обращение
+                Удалить обращение
               </button>
             </div>
           </div>
