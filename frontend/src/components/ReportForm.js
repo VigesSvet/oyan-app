@@ -40,12 +40,50 @@ const ReportForm = ({ onClose, onSuccess }) => {
     address: '',
     description: '',
     incident_date: '',
-    kuy_number: '',
-    erdr_number: ''
+    incident_time: ''
   });
   const [photo, setPhoto] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [geocoding, setGeocoding] = useState(false);
+
+  // Функция обратного геокодирования (преобразование координат в адрес)
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      setGeocoding(true);
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+      );
+      const data = await response.json();
+      
+      if (data.address) {
+        // Собираем адрес из компонентов
+        const addressParts = [];
+        const { road, house_number, suburb, city, town, county } = data.address;
+        
+        if (road) {
+          addressParts.push(house_number ? `${road}, ${house_number}` : road);
+        }
+        if (suburb && suburb !== city && suburb !== town) {
+          addressParts.push(suburb);
+        }
+        if (city || town) {
+          addressParts.push(city || town);
+        }
+        
+        const address = addressParts.join(', ') || data.display_name;
+        
+        setFormData(prev => ({
+          ...prev,
+          address: address
+        }));
+      }
+      setGeocoding(false);
+    } catch (err) {
+      console.error('Ошибка при геокодировании:', err);
+      setGeocoding(false);
+    }
+  };
 
   // Инициализация карты
   useEffect(() => {
@@ -72,21 +110,27 @@ const ReportForm = ({ onClose, onSuccess }) => {
     // Обновление координат при перемещении маркера
     marker.on('dragend', function() {
       const latLng = marker.getLatLng();
+      const newLat = parseFloat(latLng.lat.toFixed(6));
+      const newLng = parseFloat(latLng.lng.toFixed(6));
       setFormData(prev => ({
         ...prev,
-        latitude: parseFloat(latLng.lat.toFixed(6)),
-        longitude: parseFloat(latLng.lng.toFixed(6))
+        latitude: newLat,
+        longitude: newLng
       }));
+      reverseGeocode(newLat, newLng);
     });
 
     // Добавление маркера при клике на карту
     map.on('click', function(e) {
       marker.setLatLng(e.latlng);
+      const newLat = parseFloat(e.latlng.lat.toFixed(6));
+      const newLng = parseFloat(e.latlng.lng.toFixed(6));
       setFormData(prev => ({
         ...prev,
-        latitude: parseFloat(e.latlng.lat.toFixed(6)),
-        longitude: parseFloat(e.latlng.lng.toFixed(6))
+        latitude: newLat,
+        longitude: newLng
       }));
+      reverseGeocode(newLat, newLng);
     });
 
     mapRef.current = map;
@@ -101,22 +145,8 @@ const ReportForm = ({ onClose, onSuccess }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'latitude' || name === 'longitude' 
-        ? (value === '' ? '' : parseFloat(value))
-        : value
+      [name]: value
     }));
-
-    // Обновление маркера если изменились координаты
-    if ((name === 'latitude' || name === 'longitude') && markerRef.current) {
-      const newLat = name === 'latitude' ? parseFloat(value) : formData.latitude;
-      const newLng = name === 'longitude' ? parseFloat(value) : formData.longitude;
-      if (!isNaN(newLat) && !isNaN(newLng)) {
-        markerRef.current.setLatLng([newLat, newLng]);
-        if (mapRef.current) {
-          mapRef.current.panTo([newLat, newLng]);
-        }
-      }
-    }
   };
 
   const handlePhotoChange = (e) => {
@@ -132,11 +162,22 @@ const ReportForm = ({ onClose, onSuccess }) => {
 
     try {
       const data = new FormData();
+      
+      // Объединяем дату и время
+      const incidentDateTime = formData.incident_date && formData.incident_time
+        ? `${formData.incident_date}T${formData.incident_time}`
+        : formData.incident_date;
+      
+      // Добавляем все поля кроме incident_time (которое объединено с датой)
       Object.keys(formData).forEach(key => {
-        if (formData[key] !== '') {
+        if (key === 'incident_time') return; // Пропускаем время отдельно
+        if (key === 'incident_date' && incidentDateTime) {
+          data.append(key, incidentDateTime);
+        } else if (formData[key] !== '' && key !== 'incident_date') {
           data.append(key, formData[key]);
         }
       });
+      
       if (photo) {
         data.append('photo', photo);
       }
@@ -190,41 +231,26 @@ const ReportForm = ({ onClose, onSuccess }) => {
             </select>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Широта *</label>
-              <input
-                type="number"
-                step="0.000001"
-                name="latitude"
-                value={formData.latitude}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Долгота *</label>
-              <input
-                type="number"
-                step="0.000001"
-                name="longitude"
-                value={formData.longitude}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
           <div className="form-group">
             <label>Адрес *</label>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Укажите адрес происшествия"
-              required
-            />
+            <div className="address-input-wrapper">
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Укажите адрес происшествия"
+                required
+                disabled={geocoding}
+              />
+              {geocoding && (
+                <span className="geocoding-indicator">
+                  <span className="spinner"></span>
+                  <span className="loading-text">Получение адреса...</span>
+                </span>
+              )}
+            </div>
+            <small className="address-hint">Адрес получается автоматически при выборе места на карте</small>
           </div>
 
           <div className="form-group">
@@ -240,36 +266,23 @@ const ReportForm = ({ onClose, onSuccess }) => {
           </div>
 
           <div className="form-group">
-            <label>Дата и время инцидента</label>
+            <label>Дата инцидента</label>
             <input
-              type="datetime-local"
+              type="date"
               name="incident_date"
               value={formData.incident_date}
               onChange={handleChange}
             />
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>№ КУИ</label>
-              <input
-                type="text"
-                name="kuy_number"
-                value={formData.kuy_number}
-                onChange={handleChange}
-                placeholder="Номер КУИ (если есть)"
-              />
-            </div>
-            <div className="form-group">
-              <label>№ ЕРДР</label>
-              <input
-                type="text"
-                name="erdr_number"
-                value={formData.erdr_number}
-                onChange={handleChange}
-                placeholder="Номер ЕРДР (если есть)"
-              />
-            </div>
+          <div className="form-group">
+            <label>Время инцидента</label>
+            <input
+              type="time"
+              name="incident_time"
+              value={formData.incident_time}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="form-group">

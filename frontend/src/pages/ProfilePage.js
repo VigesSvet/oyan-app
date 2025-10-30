@@ -18,14 +18,35 @@ const STATUS_NAMES = {
   rejected: 'Отклонен'
 };
 
+const REDEMPTION_STATUS_NAMES = {
+  pending: 'На рассмотрении',
+  approved: 'Одобрено',
+  rejected: 'Отклонено'
+};
+
+const BONUS_REWARDS = [
+  { amount: 50, label: '50 бонусов' },
+  { amount: 100, label: '100 бонусов' },
+  { amount: 150, label: '150 бонусов' }
+];
+
 const ProfilePage = () => {
   const { user } = useAuth();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [bonusPoints, setBonusPoints] = useState(0);
+  const [showRedemptionModal, setShowRedemptionModal] = useState(false);
+  const [selectedBonus, setSelectedBonus] = useState(null);
+  const [rewardType, setRewardType] = useState('');
+  const [contactInfo, setContactInfo] = useState('');
+  const [redemptions, setRedemptions] = useState([]);
+  const [redeeming, setRedeeming] = useState(false);
 
   useEffect(() => {
     fetchMyReports();
+    fetchBonusInfo();
+    fetchMyRedemptions();
   }, []);
 
   const fetchMyReports = async () => {
@@ -39,6 +60,65 @@ const ProfilePage = () => {
       console.error('Ошибка загрузки обращений:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchBonusInfo = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('/api/bonuses/my', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBonusPoints(response.data.bonus_points);
+    } catch (error) {
+      console.error('Ошибка загрузки информации о бонусах:', error);
+    }
+  };
+
+  const fetchMyRedemptions = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('/api/bonuses/redemptions', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRedemptions(response.data);
+    } catch (error) {
+      console.error('Ошибка загрузки заявок на награждение:', error);
+    }
+  };
+
+  const handleRedeemBonus = async () => {
+    if (!selectedBonus || !rewardType) {
+      alert('Пожалуйста, выберите награду и опишите, что вы хотите получить');
+      return;
+    }
+
+    setRedeeming(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        '/api/bonuses/redeem',
+        {
+          bonus_amount: selectedBonus,
+          reward_type: rewardType,
+          contact_info: contactInfo
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      alert('Заявка на награждение успешно отправлена!');
+      setShowRedemptionModal(false);
+      setSelectedBonus(null);
+      setRewardType('');
+      setContactInfo('');
+      fetchBonusInfo();
+      fetchMyRedemptions();
+    } catch (error) {
+      alert(error.response?.data?.detail || 'Ошибка при отправке заявки');
+    } finally {
+      setRedeeming(false);
     }
   };
 
@@ -66,6 +146,81 @@ const ProfilePage = () => {
             <p><strong>Статус:</strong> {user.is_phone_verified ? '✅ Подтвержден' : '⏳ Не подтвержден'}</p>
             <p><strong>Роль:</strong> {user.is_admin ? 'Администратор' : 'Пользователь'}</p>
           </div>
+        </div>
+
+        {/* Бонус секция */}
+        <div className="bonus-section">
+          <h2>Мои бонусы</h2>
+          <div className="bonus-card">
+            <div className="bonus-progress">
+              <div className="bonus-info">
+                <span className="bonus-amount">{bonusPoints}</span>
+                <span className="bonus-label">бонусов накоплено</span>
+              </div>
+              <div className="bonus-bar-container">
+                <div className="bonus-bar">
+                  <div 
+                    className="bonus-bar-fill" 
+                    style={{ width: `${Math.min((bonusPoints / 150) * 100, 100)}%` }}
+                  ></div>
+                </div>
+                <div className="bonus-milestones">
+                  <div className="milestone">50</div>
+                  <div className="milestone">100</div>
+                  <div className="milestone">150</div>
+                </div>
+              </div>
+            </div>
+
+            {bonusPoints >= 50 && (
+              <div className="reward-options">
+                <p>Вы можете получить награду:</p>
+                <div className="reward-buttons">
+                  {BONUS_REWARDS.filter(r => r.amount <= bonusPoints).map(reward => (
+                    <button
+                      key={reward.amount}
+                      className="reward-btn"
+                      onClick={() => {
+                        setSelectedBonus(reward.amount);
+                        setShowRedemptionModal(true);
+                      }}
+                    >
+                      {reward.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {bonusPoints < 50 && (
+              <div className="bonus-hint">
+                Накопите еще {50 - bonusPoints} бонусов, чтобы получить первую награду
+              </div>
+            )}
+          </div>
+
+          {/* История заявок на награждение */}
+          {redemptions.length > 0 && (
+            <div className="redemptions-history">
+              <h3>История заявок ({redemptions.length})</h3>
+              <div className="redemptions-list">
+                {redemptions.map(redemption => (
+                  <div key={redemption.id} className="redemption-item">
+                    <div className="redemption-header">
+                      <span className="redemption-bonus">-{redemption.bonus_amount} бонусов</span>
+                      <span className={`redemption-status status-${redemption.status}`}>
+                        {REDEMPTION_STATUS_NAMES[redemption.status]}
+                      </span>
+                    </div>
+                    <p className="redemption-reward">{redemption.reward_type}</p>
+                    <p className="redemption-date">
+                      {new Date(redemption.created_at).toLocaleDateString('ru-RU')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="reports-section">
@@ -165,6 +320,69 @@ const ProfilePage = () => {
                     <p>{selectedReport.admin_notes}</p>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Модаль для выбора награды */}
+        {showRedemptionModal && (
+          <div className="modal-overlay" onClick={() => setShowRedemptionModal(false)}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Получить награду</h2>
+                <button className="close-btn" onClick={() => setShowRedemptionModal(false)}>✕</button>
+              </div>
+              
+              <div className="modal-body">
+                <div className="form-group">
+                  <label><strong>Сумма бонусов: {selectedBonus}</strong></label>
+                  <p className="form-hint">Ваш баланс: {bonusPoints} бонусов</p>
+                </div>
+
+                <div className="form-group">
+                  <label>Вид награды *</label>
+                  <select
+                    value={rewardType}
+                    onChange={(e) => setRewardType(e.target.value)}
+                    className="form-select"
+                  >
+                    <option value="">-- Выберите награду --</option>
+                    <option value="Подарочная карта">Подарочная карта</option>
+                    <option value="Скидка на покупку">Скидка на покупку</option>
+                    <option value="Бесплатная доставка">Бесплатная доставка</option>
+                    <option value="Промокод">Промокод</option>
+                    <option value="Другое">Другое</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Дополнительная информация</label>
+                  <textarea
+                    value={contactInfo}
+                    onChange={(e) => setContactInfo(e.target.value)}
+                    placeholder="Ваши контактные данные, адрес для доставки или другая информация..."
+                    rows="4"
+                    className="form-textarea"
+                  />
+                </div>
+
+                <div className="form-actions">
+                  <button 
+                    className="btn-secondary"
+                    onClick={() => setShowRedemptionModal(false)}
+                    disabled={redeeming}
+                  >
+                    Отмена
+                  </button>
+                  <button 
+                    className="btn-primary"
+                    onClick={handleRedeemBonus}
+                    disabled={redeeming}
+                  >
+                    {redeeming ? 'Отправка...' : 'Отправить заявку'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

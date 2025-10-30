@@ -13,9 +13,12 @@ import ModerationPage from './pages/admin/ModerationPage';
 import ReportsPage from './pages/admin/ReportsPage';
 import ReportDetailPage from './pages/admin/ReportDetailPage';
 import AdminMapPage from './pages/admin/AdminMapPage';
-import NewsPage from './pages/admin/NewsPage';
+import AdminNewsPage from './pages/admin/NewsPage';
+import PublicNewsPage from './pages/NewsPage';
 import PrizesPage from './pages/admin/PrizesPage';
+import PrizeRedemptionsPage from './pages/admin/PrizeRedemptionsPage';
 import ReportForm from './components/ReportForm';
+import AdminLayout from './components/AdminLayout';
 import './App.css';
 
 // Компонент для защищенных маршрутов
@@ -68,7 +71,7 @@ function AppContent() {
         />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/news" element={<div className="container"><h1>Новости (в разработке)</h1></div>} />
+        <Route path="/news" element={<PublicNewsPage />} />
         <Route path="/about" element={<div className="container"><h1>О проекте (в разработке)</h1></div>} />
         <Route 
           path="/profile" 
@@ -133,7 +136,7 @@ function AppContent() {
           path="/admin/news" 
           element={
             <AdminRoute>
-              <NewsPage />
+              <AdminNewsPage />
             </AdminRoute>
           } 
         />
@@ -142,6 +145,16 @@ function AppContent() {
           element={
             <AdminRoute>
               <PrizesPage />
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/prize-redemptions" 
+          element={
+            <AdminRoute>
+              <AdminLayout>
+                <PrizeRedemptionsPage />
+              </AdminLayout>
             </AdminRoute>
           } 
         />
