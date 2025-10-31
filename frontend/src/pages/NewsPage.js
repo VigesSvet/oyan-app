@@ -77,7 +77,7 @@ const NewsPage = () => {
             <div key={item.id} className="news-card" onClick={() => setSelectedNews(item)}>
               {item.image_url && (
                 <div className="news-card-image">
-                  <img src={item.image_url} alt={item.title} />
+                  <img src={`https://oyan-app.onrender.com${item.image_url}`} alt={item.title} />
                 </div>
               )}
               <div className="news-card-header">
@@ -109,7 +109,7 @@ const NewsPage = () => {
             
             {selectedNews.image_url && (
               <div className="news-modal-image">
-                <img src={selectedNews.image_url} alt={selectedNews.title} />
+                <img src={`https://oyan-app.onrender.com${selectedNews.image_url}`} alt={selectedNews.title} />
               </div>
             )}
             

@@ -71,7 +71,7 @@ const NewsPage = () => {
       image_url: newsItem.image_url || '',
     });
     setImageFile(null);
-    setImagePreview(newsItem.image_url || null);
+    setImagePreview(newsItem.image_url ? `https://oyan-app.onrender.com${newsItem.image_url}` : null);
     setShowModal(true);
   };
 
