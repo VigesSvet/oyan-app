@@ -53,11 +53,29 @@ const createCustomIcon = (color) => {
   });
 };
 
+const createUserLocationIcon = () => {
+  return L.divIcon({
+    className: 'user-location-marker',
+    html: `
+      <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="#4285F4" stroke-width="2" opacity="0.3"/>
+        <circle cx="20" cy="20" r="12" fill="#4285F4" opacity="0.8"/>
+        <circle cx="20" cy="20" r="6" fill="white"/>
+      </svg>
+    `,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -20]
+  });
+};
+
 const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167], isStatic = false }) => {
   const mapContainer = useRef(null);
   const mapRef = useRef(null);
   const markerClusterGroupRef = useRef(null);
   const heatmapLayerRef = useRef(null);
+  const userLocationMarkerRef = useRef(null);
+  const userLocationCircleRef = useRef(null);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [locatingUser, setLocatingUser] = useState(false);
 
@@ -202,7 +220,7 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167], isStatic = fal
 
       // Автоматически фокусируемся на маркерах
       if (markerClusterGroup.getLayers().length > 0) {
-        mapRef.current.fitBounds(markerClusterGroup.getBounds(), { padding: [50, 50] });
+        mapRef.current.fitBounds(markerClusterGroup.getBounds(), { padding: [50, 50], maxZoom: 13 });
       }
     }
 
@@ -236,14 +254,38 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167], isStatic = fal
     setLocatingUser(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude, longitude } = position.coords;
+        const { latitude, longitude, accuracy } = position.coords;
         if (mapRef.current) {
+          if (userLocationMarkerRef.current) {
+            mapRef.current.removeLayer(userLocationMarkerRef.current);
+          }
+          if (userLocationCircleRef.current) {
+            mapRef.current.removeLayer(userLocationCircleRef.current);
+          }
+
+          const accuracyCircle = L.circle([latitude, longitude], {
+            radius: accuracy,
+            color: '#4285F4',
+            fillColor: '#4285F4',
+            fillOpacity: 0.1,
+            weight: 1
+          });
+          accuracyCircle.addTo(mapRef.current);
+          userLocationCircleRef.current = accuracyCircle;
+
+          const userIcon = createUserLocationIcon();
+          const userMarker = L.marker([latitude, longitude], { icon: userIcon })
+            .bindPopup('Вы здесь');
+          userMarker.addTo(mapRef.current);
+          userLocationMarkerRef.current = userMarker;
+
           mapRef.current.setView([latitude, longitude], 15);
         }
         setLocatingUser(false);
       },
       (error) => {
         console.error('Ошибка при определении местоположения:', error);
+        alert('Не удалось определить местоположение');
         setLocatingUser(false);
       }
     );
