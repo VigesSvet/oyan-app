@@ -59,6 +59,7 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167], isStatic = fal
   const markerClusterGroupRef = useRef(null);
   const heatmapLayerRef = useRef(null);
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [locatingUser, setLocatingUser] = useState(false);
 
   // Инициализация карты
   useEffect(() => {
@@ -225,6 +226,29 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167], isStatic = fal
     }
   };
 
+  // Функция определения местоположения
+  const locateUser = () => {
+    if (!navigator.geolocation) {
+      alert('Геолокация не поддерживается вашим браузером');
+      return;
+    }
+
+    setLocatingUser(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        if (mapRef.current) {
+          mapRef.current.setView([latitude, longitude], 15);
+        }
+        setLocatingUser(false);
+      },
+      (error) => {
+        console.error('Ошибка при определении местоположения:', error);
+        setLocatingUser(false);
+      }
+    );
+  };
+
   return (
     <div className="map-wrapper">
       <div ref={mapContainer} className="map-container" />
@@ -251,6 +275,15 @@ const Map = ({ reports, onMarkerClick, center = [49.95, 82.6167], isStatic = fal
             </button>
             <button className="zoom-btn" onClick={zoomOut} title="Отдалить">
               <span className="material-symbols-outlined">remove</span>
+            </button>
+            {/* Кнопка определения местоположения */}
+            <button 
+              className={`zoom-btn location-btn ${locatingUser ? 'locating' : ''}`} 
+              onClick={locateUser} 
+              title="Мое местоположение"
+              disabled={locatingUser}
+            >
+              <span className="material-symbols-outlined">my_location</span>
             </button>
           </div>
         </div>
