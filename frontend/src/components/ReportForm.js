@@ -32,6 +32,8 @@ const ReportForm = ({ onClose, onSuccess }) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
+  const userLocationMarkerRef = useRef(null);
+  const userLocationCircleRef = useRef(null);
   
   const [formData, setFormData] = useState({
     report_type: 'drug_dealer',
@@ -46,6 +48,7 @@ const ReportForm = ({ onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [geocoding, setGeocoding] = useState(false);
+  const [locatingUser, setLocatingUser] = useState(false);
 
   // Функция обратного геокодирования (преобразование координат в адрес)
   const reverseGeocode = async (lat, lng) => {
@@ -89,7 +92,9 @@ const ReportForm = ({ onClose, onSuccess }) => {
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    const map = L.map(mapContainerRef.current).setView(
+    const map = L.map(mapContainerRef.current, {
+      zoomControl: false
+    }).setView(
       [formData.latitude, formData.longitude],
       13
     );
@@ -198,9 +203,113 @@ const ReportForm = ({ onClose, onSuccess }) => {
     }
   };
 
+  const zoomIn = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomIn();
+    }
+  };
+
+  const zoomOut = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomOut();
+    }
+  };
+
+  const createUserLocationIcon = () => {
+    return L.divIcon({
+      className: 'user-location-marker',
+      html: `
+        <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="18" fill="none" stroke="#4285F4" stroke-width="2" opacity="0.3"/>
+          <circle cx="20" cy="20" r="12" fill="#4285F4" opacity="0.8"/>
+          <circle cx="20" cy="20" r="6" fill="white"/>
+        </svg>
+      `,
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+      popupAnchor: [0, -20]
+    });
+  };
+
+  const locateUser = () => {
+    if (!navigator.geolocation) {
+      alert('Геолокация не поддерживается вашим браузером');
+      return;
+    }
+
+    setLocatingUser(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        if (mapRef.current && markerRef.current) {
+          if (userLocationMarkerRef.current) {
+            mapRef.current.removeLayer(userLocationMarkerRef.current);
+          }
+          if (userLocationCircleRef.current) {
+            mapRef.current.removeLayer(userLocationCircleRef.current);
+          }
+
+          const accuracyCircle = L.circle([latitude, longitude], {
+            radius: accuracy,
+            color: '#4285F4',
+            fillColor: '#4285F4',
+            fillOpacity: 0.1,
+            weight: 1
+          });
+          accuracyCircle.addTo(mapRef.current);
+          userLocationCircleRef.current = accuracyCircle;
+
+          const userIcon = createUserLocationIcon();
+          const userMarker = L.marker([latitude, longitude], { icon: userIcon })
+            .bindPopup('Ваше местоположение');
+          userMarker.addTo(mapRef.current);
+          userLocationMarkerRef.current = userMarker;
+
+          markerRef.current.setLatLng([latitude, longitude]);
+          const newLat = parseFloat(latitude.toFixed(6));
+          const newLng = parseFloat(longitude.toFixed(6));
+          setFormData(prev => ({
+            ...prev,
+            latitude: newLat,
+            longitude: newLng
+          }));
+          reverseGeocode(newLat, newLng);
+
+          mapRef.current.setView([latitude, longitude], 16);
+        }
+        setLocatingUser(false);
+      },
+      (error) => {
+        console.error('Ошибка при определении местоположения:', error);
+        alert('Не удалось определить местоположение');
+        setLocatingUser(false);
+      }
+    );
+  };
+
   return (
     <div className="report-form-fullscreen">
-      <div className="report-form-map-container" ref={mapContainerRef} />
+      <div className="report-form-map-container" ref={mapContainerRef}>
+        <div className="map-controls-form">
+          <div className="zoom-controls-form">
+            <button type="button" className="zoom-btn-form" onClick={zoomIn} title="Приблизить">
+              <span className="material-symbols-outlined">add</span>
+            </button>
+            <button type="button" className="zoom-btn-form" onClick={zoomOut} title="Отдалить">
+              <span className="material-symbols-outlined">remove</span>
+            </button>
+            <button 
+              type="button"
+              className={`zoom-btn-form location-btn-form ${locatingUser ? 'locating' : ''}`} 
+              onClick={locateUser} 
+              title="Мое местоположение"
+              disabled={locatingUser}
+            >
+              <span className="material-symbols-outlined">my_location</span>
+            </button>
+          </div>
+        </div>
+      </div>
       
       <div className="report-form-panel">
         <div className="report-form-header">

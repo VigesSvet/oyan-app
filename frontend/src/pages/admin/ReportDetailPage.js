@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import AdminLayout from '../../components/AdminLayout';
+import Map from '../../components/Map';
 import './ReportDetailPage.css';
 
 const REPORT_TYPE_NAMES = {
@@ -140,6 +141,18 @@ const ReportDetailPage = () => {
                 <p><strong>Дата инцидента:</strong> {report.incident_date}</p>
               )}
               <p><strong>Дата создания:</strong> {new Date(report.created_at).toLocaleString('ru-RU')}</p>
+            </div>
+
+            {/* Карта с местоположением обращения */}
+            <div className="detail-card">
+              <h3>Местоположение на карте</h3>
+              <div style={{ height: '400px', borderRadius: '8px', overflow: 'hidden' }}>
+                <Map 
+                  reports={[report]} 
+                  center={[report.latitude, report.longitude]}
+                  isStatic={false}
+                />
+              </div>
             </div>
           </div>
 

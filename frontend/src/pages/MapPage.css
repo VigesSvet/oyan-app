@@ -6,6 +6,10 @@
   overflow: hidden;
 }
 
+.map-page .map-wrapper {
+  height: 100%;
+}
+
 /* Плавающая кнопка "Сообщить" внизу справа */
 .floating-report-btn {
   position: absolute;
